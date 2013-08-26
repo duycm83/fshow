@@ -37,7 +37,8 @@ public class Optimized2000PlanesFragment extends AExampleFragment {
 
 		protected void initScene() {
 			DirectionalLight light = new DirectionalLight(0, 0, 1);
-			getCurrentCamera().setPosition(0, 0, -16);
+//			getCurrentCamera().setPosition(0, 0, -16);
+			getCurrentCamera().setPosition(0, 0, 1);
 
 			mPlanes = new PlanesGalore();
 			try {
@@ -78,7 +79,7 @@ public class Optimized2000PlanesFragment extends AExampleFragment {
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			super.onSurfaceCreated(gl, config);
 			mStartTime = System.currentTimeMillis();
-			mCamAnim.play();
+//			mCamAnim.play();
 		}
 
 		public void onDrawFrame(GL10 glUnused) {
