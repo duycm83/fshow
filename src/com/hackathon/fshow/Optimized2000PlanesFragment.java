@@ -12,16 +12,34 @@ import rajawali.materials.textures.ATexture.TextureException;
 import rajawali.materials.textures.Texture;
 import rajawali.math.vector.Vector3;
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.example.fshow.planes.PlanesGalore;
 import com.example.fshow.planes.PlanesGaloreMaterial;
 
-public class Optimized2000PlanesFragment extends AExampleFragment {
+public class Optimized2000PlanesFragment extends AExampleFragment implements OnTouchListener {
 
+	private static final String TAG = "Optimized2000PlanesFragment";
+	private Optimized2000PlanesRenderer mRenderer = null;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+	
+	public Optimized2000PlanesRenderer getRenderer() {
+		return mRenderer;
+	}
+	
 	@Override
 	protected AExampleRenderer createRenderer() {
-		return new Optimized2000PlanesRenderer(getActivity());
+		mRenderer = new Optimized2000PlanesRenderer(getActivity());
+		return mRenderer;
 	}
 
 	private final class Optimized2000PlanesRenderer extends AExampleRenderer {
@@ -86,8 +104,25 @@ public class Optimized2000PlanesFragment extends AExampleFragment {
 			super.onDrawFrame(glUnused);
 			mMaterial
 					.setTime((System.currentTimeMillis() - mStartTime) / 1000f);
+			
+			mPlanes.getGeometry().changeBufferData(mPlanes.getBufferInfo(), 
+					mPlanes.getVertexBuffer(), 0);
+			
+		}
+		
+		public void updateBuffer() {
+			mPlanes.updateBuffer();
 		}
 
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		Log.v(TAG, "@@@onTouch");
+		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			mRenderer.updateBuffer();
+		}
+		return true;
 	}
 
 }

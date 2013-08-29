@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 public class MainActivity extends RajawaliActivity {
@@ -75,6 +76,8 @@ public class MainActivity extends RajawaliActivity {
 			fragment = (Fragment) fragClass.getConstructors()[0].newInstance();
 			transaction.add(R.id.content_frame, fragment, FRAGMENT_TAG);
 			transaction.commit();
+			View view = findViewById(R.id.content_frame);
+			view.setOnTouchListener((Optimized2000PlanesFragment)fragment);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
