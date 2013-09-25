@@ -1,7 +1,7 @@
-package com.example.fshow.planes;
+package com.hackathon.fshow.planes;
 
 import rajawali.materials.AMaterial;
-import rajawali.math.vector.Vector3;
+import rajawali.math.Vector3;
 import android.opengl.GLES20;
 
 /**
@@ -114,7 +114,7 @@ public class PlanesGaloreMaterial extends AMaterial {
 	}
 
 	public void setCameraPosition(Vector3 cameraPos) {
-		mCamPos[0] = (float) cameraPos.x; mCamPos[1] = (float) cameraPos.y; mCamPos[2] = (float) cameraPos.z;
+		mCamPos[0] = cameraPos.x; mCamPos[1] = cameraPos.y; mCamPos[2] = cameraPos.z;
 		GLES20.glUniform3fv(muCamPosHandle, 1, mCamPos, 0);
 	}
 	
