@@ -26,9 +26,10 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements OnObject
 	private Vector3 mNewObjPos;
 	private float[] mViewMatrix;
 	private float[] mProjectionMatrix;
-
+	private Context mContext;
 	public ObjectDraggingRenderer(Context context) {
 		super(context);
+		this.mContext = context;
 		setFrameRate(60);
 	}
 
@@ -47,7 +48,7 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements OnObject
 
 		mPicker = new ObjectColorPicker(this);
 		mPicker.setOnObjectPickedListener(this);
-		AutoGenerateItem.addNewObject(this, mPicker, light);
+		AutoGenerateItem.addNewObject(mContext, this, mPicker, light);
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
