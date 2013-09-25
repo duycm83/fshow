@@ -1,15 +1,15 @@
-package com.example.fshow.planes;
+package com.hackathon.fshow.planes;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+import rajawali.BaseObject3D;
 import rajawali.BufferInfo;
 import rajawali.Camera;
 import rajawali.Geometry3D;
 import rajawali.Geometry3D.BufferType;
-import rajawali.Object3D;
-import rajawali.math.vector.Vector3;
+import rajawali.math.Vector3;
 import android.graphics.Color;
 import android.opengl.GLES20;
 
@@ -30,15 +30,12 @@ import android.opengl.GLES20;
  * @author dennis.ippel
  *
  */
-public class PlanesGalore extends Object3D {
+public class PlanesGalore extends BaseObject3D {
 	protected FloatBuffer mPlanePositions;
 	protected FloatBuffer mRotationSpeeds;
 	protected BufferInfo mPlanePositionsBufferInfo;
 	protected BufferInfo mRotationSpeedsBufferInfo;
 	protected PlanesGaloreMaterial mGaloreMat;
-	static final int NUM_PLANES = 2000;
-	static final float PLANESIZE = .3f;
-	static int NUM_VERTICES = NUM_PLANES * 4;
 
 	public PlanesGalore() {
 		super();
@@ -50,34 +47,34 @@ public class PlanesGalore extends Object3D {
 	public void init() {
 		mGaloreMat = new PlanesGaloreMaterial();
 		setMaterial(mGaloreMat);
+		final int numPlanes = 2000;
+		final float planeSize = .3f;
 
-		float[] vertices = new float[NUM_VERTICES * 3];
-		float[] textureCoords = new float[NUM_VERTICES * 2];
-		float[] normals = new float[NUM_VERTICES * 3];
-		float[] planePositions = new float[NUM_VERTICES * 3];
-		float[] rotationSpeeds = new float[NUM_VERTICES];
-		float[] colors = new float[NUM_VERTICES * 4];
-		int[] indices = new int[NUM_PLANES * 6];
+		int numVertices = numPlanes * 4;
+		float[] vertices = new float[numVertices * 3];
+		float[] textureCoords = new float[numVertices * 2];
+		float[] normals = new float[numVertices * 3];
+		float[] planePositions = new float[numVertices * 3];
+		float[] rotationSpeeds = new float[numVertices];
+		float[] colors = new float[numVertices * 4];
+		int[] indices = new int[numPlanes * 6];
 
-		for (int i = 0; i < NUM_PLANES; ++i) {
-			Vector3 r = new Vector3(-10f + 
-					(Math.random() * 20f), -10 + 
-					(Math.random() * 20f), 
-					(Math.random() * 80f));
+		for (int i = 0; i < numPlanes; ++i) {
+			Vector3 r = new Vector3(-10f + (Math.random() * 20f), -10 + (Math.random() * 20f), (Math.random() * 80f));
 			int randColor = 0xff000000 + (int) (0xffffff * Math.random());
 
 			int vIndex = i * 4 * 3;
-			vertices[vIndex + 0] = -PLANESIZE;
-			vertices[vIndex + 1] = PLANESIZE;
+			vertices[vIndex + 0] = -planeSize;
+			vertices[vIndex + 1] = planeSize;
 			vertices[vIndex + 2] = 0;
-			vertices[vIndex + 3] = PLANESIZE;
-			vertices[vIndex + 4] = PLANESIZE;
+			vertices[vIndex + 3] = planeSize;
+			vertices[vIndex + 4] = planeSize;
 			vertices[vIndex + 5] = 0;
-			vertices[vIndex + 6] = PLANESIZE;
-			vertices[vIndex + 7] = -PLANESIZE;
+			vertices[vIndex + 6] = planeSize;
+			vertices[vIndex + 7] = -planeSize;
 			vertices[vIndex + 8] = 0;
-			vertices[vIndex + 9] = -PLANESIZE;
-			vertices[vIndex + 10] = -PLANESIZE;
+			vertices[vIndex + 9] = -planeSize;
+			vertices[vIndex + 10] = -planeSize;
 			vertices[vIndex + 11] = 0;
 
 			for (int j = 0; j < 12; j += 3) {
@@ -85,9 +82,9 @@ public class PlanesGalore extends Object3D {
 				normals[vIndex + j + 1] = 0;
 				normals[vIndex + j + 2] = 1;
 
-				planePositions[vIndex + j] = (float) r.x;
-				planePositions[vIndex + j + 1] = (float) r.y;
-				planePositions[vIndex + j + 2] = (float) r.z;
+				planePositions[vIndex + j] = r.x;
+				planePositions[vIndex + j + 1] = r.y;
+				planePositions[vIndex + j + 2] = r.z;
 			}
 
 			vIndex = i * 4 * 4;
@@ -133,27 +130,23 @@ public class PlanesGalore extends Object3D {
 
 		setData(vertices, normals, textureCoords, colors, indices);
 
-		mPlanePositions = ByteBuffer.allocateDirect(planePositions.length * Geometry3D.FLOAT_SIZE_BYTES)
-				.order(ByteOrder.nativeOrder()).asFloatBuffer();
+		mPlanePositions = ByteBuffer.allocateDirect(planePositions.length * Geometry3D.FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		mPlanePositions.put(planePositions);
 
-//		mRotationSpeeds = ByteBuffer.allocateDirect(rotationSpeeds.length * Geometry3D.FLOAT_SIZE_BYTES)
-//				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-//		mRotationSpeeds.put(rotationSpeeds);
+		mRotationSpeeds = ByteBuffer.allocateDirect(rotationSpeeds.length * Geometry3D.FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		mRotationSpeeds.put(rotationSpeeds);
 
 		createBuffers();
 	}
-
+	
 	private void createBuffers() {
-		mGeometry.createBuffer(mPlanePositionsBufferInfo, BufferType.FLOAT_BUFFER, mPlanePositions,
-				GLES20.GL_ARRAY_BUFFER);
+		mGeometry.createBuffer(mPlanePositionsBufferInfo, BufferType.FLOAT_BUFFER, mPlanePositions, GLES20.GL_ARRAY_BUFFER);
 		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-		//		mGeometry.createBuffer(mRotationSpeedsBufferInfo, BufferType.FLOAT_BUFFER, mRotationSpeeds, GLES20.GL_ARRAY_BUFFER);
-		//		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
+		mGeometry.createBuffer(mRotationSpeedsBufferInfo, BufferType.FLOAT_BUFFER, mRotationSpeeds, GLES20.GL_ARRAY_BUFFER);
+		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 	}
-
+	
 	public void reload() {
 		super.reload();
 		createBuffers();
@@ -162,50 +155,6 @@ public class PlanesGalore extends Object3D {
 	protected void setShaderParams(Camera camera) {
 		super.setShaderParams(camera);
 		mGaloreMat.setPlanePositions(mPlanePositionsBufferInfo.bufferHandle);
-		//		mGaloreMat.setRotationSpeeds(mRotationSpeedsBufferInfo.bufferHandle);
-	}
-	
-	public BufferInfo getBufferInfo() {
-		return mPlanePositionsBufferInfo;
-	}
-
-	public FloatBuffer getVertexBuffer() {
-		return mPlanePositions;
-	}
-	public void updateBuffer() {
-		float[] vertices = new float[NUM_VERTICES * 3];
-		float[] normals = new float[NUM_VERTICES * 3];
-		float[] planePositions = new float[NUM_VERTICES * 3];
-
-		for (int i = 0; i < NUM_PLANES; ++i) {
-			Vector3 r = new Vector3(-10f + (Math.random() * 20f), -10 + (Math.random() * 20f), (Math.random() * 80f));
-			int vIndex = i * 4 * 3;
-			vertices[vIndex + 0] = -PLANESIZE;
-			vertices[vIndex + 1] = PLANESIZE;
-			vertices[vIndex + 2] = 0;
-			vertices[vIndex + 3] = PLANESIZE;
-			vertices[vIndex + 4] = PLANESIZE;
-			vertices[vIndex + 5] = 0;
-			vertices[vIndex + 6] = PLANESIZE;
-			vertices[vIndex + 7] = -PLANESIZE;
-			vertices[vIndex + 8] = 0;
-			vertices[vIndex + 9] = -PLANESIZE;
-			vertices[vIndex + 10] = -PLANESIZE;
-			vertices[vIndex + 11] = 0;
-
-			for (int j = 0; j < 12; j += 3) {
-				normals[vIndex + j] = 0;
-				normals[vIndex + j + 1] = 0;
-				normals[vIndex + j + 2] = 1;
-
-				planePositions[vIndex + j] = (float) r.x;
-				planePositions[vIndex + j + 1] = (float) r.y;
-				planePositions[vIndex + j + 2] = (float) r.z;
-			}
-		}
-		mPlanePositions = ByteBuffer.allocateDirect(planePositions.length * Geometry3D.FLOAT_SIZE_BYTES)
-				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		
-		mPlanePositions.put(planePositions);
+		mGaloreMat.setRotationSpeeds(mRotationSpeedsBufferInfo.bufferHandle);
 	}
 }
