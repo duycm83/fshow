@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10" >
+
         <requestFocus />
     </EditText>
 
@@ -30,8 +31,8 @@
         android:id="@+id/editTextEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:ems="10" />
+        android:ems="10"
+        android:inputType="textEmailAddress" />
 
     <TextView
         android:id="@+id/textView3"
