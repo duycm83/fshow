@@ -42,7 +42,13 @@ public class AutoGenerateItem {
 //				plane.setZ(-2 + (float) (Math.random() * -6));
 				plane.setX(-4 + (float) (Math.random() * 8));
 				plane.setY(-4 + (float) (Math.random() * 8));
-				plane.setZ(-6 + (float) (Math.random() * -12));
+				if (i < 30) {
+					plane.setZ(Layer.LAYER1_MINZ + (float) (Math.random() * -Layer.LAYER1_MAXZ));
+				} else if (i < 60) {
+					plane.setZ(Layer.LAYER2_MINZ + (float) (Math.random() * -Layer.LAYER2_MAXZ));
+				} else {
+					plane.setZ(Layer.LAYER3_MINZ + (float) (Math.random() * -Layer.LAYER3_MAXZ));
+				}
 				picker.registerObject(plane);
 				renderer.addChild(plane);
 			}

@@ -64,7 +64,7 @@ public class TestBase64Bitmap extends Activity {
 
 	public void onButtonClick(View view) {
 		int id = view.getId();
-		if (id == R.id.button1) {
+		if (id == R.id.buttonResgister) {
 			encoded = ImageUtils.encodeToString(bit);
 			textView.setText(encoded);
 			Log.v(TAG, encoded);

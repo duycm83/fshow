@@ -10,4 +10,8 @@
     <string name="update">更新</string>
     <string name="screen_switch">画面切り替え</string>
     <string name="new_item">アイテム登録</string>
+    <string name="name">名前</string>
+    <string name="email">メールアドレス</string>
+    <string name="password">パースワード</string>
+    <string name="register">登録</string>
 </resources>
