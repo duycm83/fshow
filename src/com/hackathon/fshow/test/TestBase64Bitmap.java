@@ -29,7 +29,7 @@ public class TestBase64Bitmap extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_image_base64);
 		textView = (TextView) findViewById(R.id.textView1);
-		image1 = (ImageView) findViewById(R.id.imageView1);
+		image1 = (ImageView) findViewById(R.id.imageViewUpload);
 		image2 = (ImageView) findViewById(R.id.imageView2);
 
 		Runnable runnable = new Runnable() {
