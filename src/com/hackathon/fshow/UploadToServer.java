@@ -3,6 +3,7 @@ package com.hackathon.fshow;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +11,7 @@ import java.net.URL;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,8 +29,8 @@ public class UploadToServer extends Activity {
 	String upLoadServerUri = null;
 
 	/**********  File Path *************/
-	final String uploadFilePath = "/mnt/sdcard/";
-	final String uploadFileName = "service_lifecycle.png";
+	final String uploadFilePath = Environment.getExternalStorageDirectory().getPath();
+	final String uploadFileName = "Hummer.jpg";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,10 +41,10 @@ public class UploadToServer extends Activity {
 		uploadButton = (Button) findViewById(R.id.uploadButton);
 		messageText = (TextView) findViewById(R.id.messageText);
 
-		messageText.setText("Uploading file path :- '/mnt/sdcard/" + uploadFileName + "'");
+		messageText.setText("Uploading file path :- '" +uploadFilePath+ uploadFileName + "'");
 
 		/************* Php script path ****************/
-		upLoadServerUri = "http://www.androidexample.com/media/UploadToServer.php";
+		upLoadServerUri = "http://133.242.168.69/team_h/fshow/develop/fashion/UploadToServer.php";
 
 		uploadButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -57,9 +59,17 @@ public class UploadToServer extends Activity {
 								messageText.setText("uploading started.....");
 							}
 						});
-
-						uploadFile(uploadFilePath + "" + uploadFileName);
-
+						File file = new File(uploadFilePath + "/" + uploadFileName);
+						if (file.exists()) {
+							uploadFile(file.getAbsolutePath());
+						} else {
+						
+							try {
+								throw new FileNotFoundException("file not found:"+file.getAbsolutePath());
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							}
+						}
 					}
 				}).start();
 			}
@@ -115,13 +125,13 @@ public class UploadToServer extends Activity {
                    conn.setRequestProperty("Connection", "Keep-Alive");
                    conn.setRequestProperty("ENCTYPE", "multipart/form-data");
                    conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-                   conn.setRequestProperty("uploaded_file", fileName);
+                   conn.setRequestProperty("file", fileName);
                     
                    dos = new DataOutputStream(conn.getOutputStream());
           
                    dos.writeBytes(twoHyphens + boundary + lineEnd);
-                   dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
-                                             + fileName +""+ lineEnd);
+                   dos.writeBytes("Content-Disposition: form-data; name=\"file\";filename=\""
+                                             + fileName +"\""+ lineEnd);
                     
                    dos.writeBytes(lineEnd);
           
