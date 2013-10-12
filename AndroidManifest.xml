@@ -21,10 +21,10 @@
         <activity
             android:name="ObjectDraggingActivity"
             android:label="@string/app_name" >
-<!--             <intent-filter> -->
-<!--                 <action android:name="android.intent.action.MAIN" /> -->
-<!--                 <category android:name="android.intent.category.LAUNCHER" /> -->
-<!--             </intent-filter> -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".test.TestBase64Bitmap">
 <!--              <intent-filter> -->
@@ -44,12 +44,14 @@
 <!--                 <category android:name="android.intent.category.LAUNCHER" /> -->
 <!--             </intent-filter> -->
         </activity>
-        <activity android:name="UploadToServer">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name="ItemResgisterActivity">
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.MAIN" /> -->
+<!--                 <category android:name="android.intent.category.LAUNCHER" /> -->
+<!--             </intent-filter> -->
         </activity>
+        <activity android:name="UserLoginActivity"></activity>
+        <activity android:name="UserInfoViewActivity"></activity>
     </application>
 
 </manifest>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="domain_user_insert">"http://133.242.168.69/team_h/fshow/develop/fashion/UserInsertAction.php"</string>
+    <string name="domain_upload_image">"http://133.242.168.69/team_h/fshow/develop/fashion/UploadToServer.php"</string>
+</resources>

@@ -25,5 +25,11 @@
         android:showAsAction="ifRoom"
         android:title="@string/new_item">
     </item>
+    <item
+        android:id="@+id/action_user"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:showAsAction="ifRoom"
+        android:title="@string/user">
+    </item>
 
 </menu>

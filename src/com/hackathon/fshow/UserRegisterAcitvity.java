@@ -14,6 +14,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,13 +31,13 @@ public class UserRegisterAcitvity extends Activity {
 	private static final int DIALOG_REGISTER_FAILED = 2;
 	
 	
-	private String urlString = "http://133.242.168.69/team_h/fshow/develop/fashion/UserInsertAction.php";
+	
 	private UserInfo mUserInfo = null;
 
 	private EditText editTextName = null;
 	private EditText editTextEmail = null;
 	private EditText editTextPassword = null;
-	
+	private String mUrlString ;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class UserRegisterAcitvity extends Activity {
 		editTextName = (EditText) findViewById(R.id.editTextName);
 		editTextEmail = (EditText) findViewById(R.id.editTextEmail);
 		editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+		mUrlString = getString(R.string.domain_user_insert);
 		findViewById(R.id.buttonResgister).setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -51,15 +55,7 @@ public class UserRegisterAcitvity extends Activity {
 				mUserInfo.setName(editTextName.getText().toString());
 				mUserInfo.setEmail(editTextEmail.getText().toString());
 				mUserInfo.setPassword(editTextPassword.getText().toString());
-				boolean result = postFormData(mUserInfo, urlString);
-				if (result) {
-					showDialog(DIALOG_REGISTER_SUCCESS);
-				} else {
-					showDialog(DIALOG_REGISTER_FAILED);
-				}
-//				android.app.FragmentManager manager = getFragmentManager();  
-//		        FShowDialogFragment dialog = new FShowDialogFragment();  
-//		        dialog.show(manager, "dialog");
+				new UserRegisterAsyncTask().execute(mUserInfo);
 			}
 		});
 	}
@@ -76,42 +72,92 @@ public class UserRegisterAcitvity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);  
 		if (id == DIALOG_REGISTER_SUCCESS) {
 			builder.setTitle("登録成功");  
-	        builder.setPositiveButton("OK", null);
+	        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent intent = new Intent(UserRegisterAcitvity.this, UserLoginActivity.class);
+					startActivity(intent);
+					finish();
+				}
+			});
 		} else {
-			builder.setTitle("登録失敗");  
-	        builder.setPositiveButton("再入力", null);
+			builder.setTitle("登録失敗,再入力してください。");  
+	        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					clearAllInputed();
+				}
+			});
+	        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			});
 		}
 		dialog = builder.create();
 		return dialog;
 	}
 	
-	private boolean postFormData(UserInfo userInfo, String url) {
-		boolean result = false;
-		// Create a new HttpClient and Post Header
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpPost httppost = new HttpPost(url);
+	
 
-		// Add your data
-		List<NameValuePair> nameValuePairs = userInfo.makePostFormData();
-		if (nameValuePairs != null) {
-			try {
-				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-				// Execute HTTP Post Request
-				HttpResponse response = httpclient.execute(httppost);
-				int statusCode = response.getStatusLine().getStatusCode();
-				if (statusCode == 200) {
-					Log.v(TAG, "@@@status code:"+statusCode);
-					result = true;
-				}
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			Log.e(TAG, "@@@ INPUT ERROR");
+	private class UserRegisterAsyncTask extends AsyncTask<UserInfo, Integer, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(UserInfo... params) {
+			UserInfo userInfo = params[0];
+			boolean result = postFormData(userInfo);
+			return result;
 		}
-		return result;
-	}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if (result) {
+				showDialog(DIALOG_REGISTER_SUCCESS);
+			} else {
+				showDialog(DIALOG_REGISTER_FAILED);
+			}
+		}
+		
+		private boolean postFormData(UserInfo userInfo) {
+			boolean result = false;
+			// Create a new HttpClient and Post Header
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost(mUrlString);
 
+			// Add your data
+			List<NameValuePair> nameValuePairs = userInfo.makePostFormData();
+			if (nameValuePairs != null) {
+				try {
+					httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+					// Execute HTTP Post Request
+					HttpResponse response = httpclient.execute(httppost);
+					int statusCode = response.getStatusLine().getStatusCode();
+					if (statusCode == 200) {
+						Log.v(TAG, "@@@status code:"+statusCode);
+						result = true;
+					}
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				Log.e(TAG, "@@@ INPUT ERROR");
+			}
+			return result;
+		}
+	}
+	
+	/**
+	 * すべて入力を削除
+	 */
+	private void clearAllInputed() {
+		editTextEmail.getText().clear();
+		editTextName.getText().clear();
+		editTextPassword.getText().clear();
+	}
 }

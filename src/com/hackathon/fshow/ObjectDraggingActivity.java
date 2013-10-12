@@ -1,5 +1,6 @@
 package com.hackathon.fshow;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
@@ -63,6 +64,14 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    Toast.makeText(this, "Selected Item: " + item.getTitle(), Toast.LENGTH_SHORT).show();
+	    int id = item.getItemId();
+	    if (id == R.id.action_user) {
+	    	Intent intent = new Intent(this, UserRegisterAcitvity.class);
+	    	startActivity(intent);
+	    } else if (id == R.id.action_new) {
+	    	Intent intent = new Intent(this, ItemResgisterActivity.class);
+	    	startActivity(intent);
+	    }
 	    return true;
 	}
 }

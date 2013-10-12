@@ -16,4 +16,7 @@
     <string name="register">登録</string>
     <string name="upload">アップロード</string>
     <string name="exception_message">アップロード失敗しました。</string>
+    <string name="user">ログイン</string>
+    <string name="browse">イメージ選択</string>
+    <string name="upload_image">イメージをアップロードする</string>
 </resources>

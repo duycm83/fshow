@@ -28,7 +28,7 @@ public class TestBase64Bitmap extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_image_base64);
-		textView = (TextView) findViewById(R.id.textView1);
+		textView = (TextView) findViewById(R.id.textViewSelectedPath);
 		image1 = (ImageView) findViewById(R.id.imageViewUpload);
 		image2 = (ImageView) findViewById(R.id.imageView2);
 
