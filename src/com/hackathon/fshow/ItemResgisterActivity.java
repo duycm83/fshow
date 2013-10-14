@@ -46,6 +46,8 @@ public class ItemResgisterActivity extends Activity {
 	private String mUpLoadServerUri = null;
 	private Uri outputFileUri;
 	private Uri selectedImageUri;
+	private String mFileUploadName;
+	private int mUserId = 999;
 	/********** File Path *************/
 	final String uploadFilePath = Environment.getExternalStorageDirectory()
 			.getPath();
@@ -62,6 +64,8 @@ public class ItemResgisterActivity extends Activity {
 		/************* Php script path ****************/
 		mUpLoadServerUri = getString(R.string.domain_upload_image);
 
+		mFileUploadName = String.format("%04d%n_%d.jpg", mUserId,
+				System.currentTimeMillis());
 		mButtonUpload.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -70,17 +74,20 @@ public class ItemResgisterActivity extends Activity {
 				}
 				dialog = ProgressDialog.show(ItemResgisterActivity.this, "",
 						"Uploading file...", true);
-				
+
 				new Thread(new Runnable() {
 					public void run() {
 						runOnUiThread(new Runnable() {
 							public void run() {
-								Toast.makeText(getBaseContext(), "uploading started.....", Toast.LENGTH_SHORT).show();
+								Toast.makeText(getBaseContext(),
+										"uploading started.....",
+										Toast.LENGTH_SHORT).show();
 							}
 						});
 						File file = new File(mUploadFileName);
 						if (file.exists()) {
-							uploadFile(file.getAbsolutePath());
+							 uploadFile(file.getAbsolutePath());
+//							uploadFile(mUserId, file);
 						} else {
 
 							try {
@@ -128,8 +135,11 @@ public class ItemResgisterActivity extends Activity {
 
 			runOnUiThread(new Runnable() {
 				public void run() {
-					Toast.makeText(getBaseContext(), "Source File not exist :"
-							+ uploadFilePath + "" + mUploadFileName, Toast.LENGTH_SHORT).show();
+					Toast.makeText(
+							getBaseContext(),
+							"Source File not exist :" + uploadFilePath + ""
+									+ mUploadFileName, Toast.LENGTH_SHORT)
+							.show();
 				}
 			});
 
@@ -157,9 +167,20 @@ public class ItemResgisterActivity extends Activity {
 
 				dos = new DataOutputStream(conn.getOutputStream());
 
+				// Send parameter #1
+				dos.writeBytes(twoHyphens + boundary + lineEnd);
+				dos.writeBytes("Content-Disposition: form-data; name=\"userid\""
+						+ lineEnd);
+				dos.writeBytes("Content-Type: text/plain; charset=UTF-8"
+						+ lineEnd);
+				dos.writeBytes("Content-Transfer-Encoding: 8bit" + lineEnd);
+				dos.writeBytes(lineEnd);
+				dos.writeBytes(String.valueOf(mUserId) + lineEnd);
+
+				// Send parameter #2
 				dos.writeBytes(twoHyphens + boundary + lineEnd);
 				dos.writeBytes("Content-Disposition: form-data; name=\"file\";filename=\""
-						+ fileName + "\"" + lineEnd);
+						+ mFileUploadName + "\"" + lineEnd);
 
 				dos.writeBytes(lineEnd);
 
@@ -196,10 +217,6 @@ public class ItemResgisterActivity extends Activity {
 
 					runOnUiThread(new Runnable() {
 						public void run() {
-
-							String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
-									+ " http://www.androidexample.com/media/uploads/"
-									+ mUploadFileName;
 							Toast.makeText(ItemResgisterActivity.this,
 									"File Upload Complete.", Toast.LENGTH_SHORT)
 									.show();
@@ -304,41 +321,44 @@ public class ItemResgisterActivity extends Activity {
 					}
 				}
 
-				
 				if (isCamera) {
 					selectedImageUri = outputFileUri;
 				} else {
 					selectedImageUri = data == null ? null : data.getData();
 				}
 				Log.v(TAG, "selected image:" + selectedImageUri.toString());
-				
+
 				mUploadFileName = getRealPathFromURI(selectedImageUri);
 				if (mUploadFileName != null) {
 					mTextViewSelectedPath.setText(mUploadFileName);
-					
-					BitmapDrawable bd = (BitmapDrawable)mImageViewSelectedImage.getDrawable();
+
+					BitmapDrawable bd = (BitmapDrawable) mImageViewSelectedImage
+							.getDrawable();
 					bd.getBitmap().recycle();
 					mImageViewSelectedImage.setImageBitmap(null);
 					BitmapFactory.Options options = new BitmapFactory.Options();
-		            options.inSampleSize = 2;
-					Bitmap myBitmap = BitmapFactory.decodeFile(mUploadFileName, options);
-//					mImageViewSelectedImage.setImageURI(selectedImageUri);
+					options.inSampleSize = 2;
+					Bitmap myBitmap = BitmapFactory.decodeFile(mUploadFileName,
+							options);
+					// mImageViewSelectedImage.setImageURI(selectedImageUri);
 					mImageViewSelectedImage.setImageBitmap(myBitmap);
 				}
 			}
 		}
 	}
-	
+
 	private String getRealPathFromURI(Uri contentUri) {
 		String path = null;
 		String[] proj = { MediaStore.Images.Media.DATA };
-	    CursorLoader loader = new CursorLoader(this, contentUri, proj, null, null, null);
-	    Cursor cursor = loader.loadInBackground();
-	    if (cursor != null && cursor.moveToFirst()) {
-	    	int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-	    	path = cursor.getString(column_index);
-	    	cursor.close();
-	    }
-	    return path;
+		CursorLoader loader = new CursorLoader(this, contentUri, proj, null,
+				null, null);
+		Cursor cursor = loader.loadInBackground();
+		if (cursor != null && cursor.moveToFirst()) {
+			int column_index = cursor
+					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			path = cursor.getString(column_index);
+			cursor.close();
+		}
+		return path;
 	}
 }
