@@ -66,7 +66,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 	    Toast.makeText(this, "Selected Item: " + item.getTitle(), Toast.LENGTH_SHORT).show();
 	    int id = item.getItemId();
 	    if (id == R.id.action_user) {
-	    	Intent intent = new Intent(this, UserRegisterAcitvity.class);
+	    	Intent intent = new Intent(this, UserLoginActivity.class);
 	    	startActivity(intent);
 	    } else if (id == R.id.action_new) {
 	    	Intent intent = new Intent(this, ItemResgisterActivity.class);

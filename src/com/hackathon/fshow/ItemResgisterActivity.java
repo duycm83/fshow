@@ -58,7 +58,7 @@ public class ItemResgisterActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_upload_to_server);
 		mButtonUpload = (Button) findViewById(R.id.uploadButton);
-		mButtonSelectImage = (Button) findViewById(R.id.buttonSelectImage);
+		mButtonSelectImage = (Button) findViewById(R.id.buttonLogin);
 		mImageViewSelectedImage = (ImageView) findViewById(R.id.imageViewSelectedImage);
 		mTextViewSelectedPath = (TextView) findViewById(R.id.textViewSelectedPath);
 		/************* Php script path ****************/

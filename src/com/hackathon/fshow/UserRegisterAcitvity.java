@@ -25,7 +25,7 @@ import android.widget.EditText;
 
 import com.hackathon.fshow.module.UserInfo;
 
-public class UserRegisterAcitvity extends Activity {
+public class UserRegisterAcitvity extends Activity implements OnClickListener {
 	private static final String TAG = "UserRegisterAcitvity";
 	private static final int DIALOG_REGISTER_SUCCESS = 1;
 	private static final int DIALOG_REGISTER_FAILED = 2;
@@ -44,20 +44,11 @@ public class UserRegisterAcitvity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_register);
 		mUserInfo = new UserInfo();
-		editTextName = (EditText) findViewById(R.id.editTextName);
-		editTextEmail = (EditText) findViewById(R.id.editTextEmail);
-		editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+		editTextName = (EditText) findViewById(R.id.editTextRegName);
+		editTextEmail = (EditText) findViewById(R.id.editTextRegEmail);
+		editTextPassword = (EditText) findViewById(R.id.editTextRegPassword);
 		mUrlString = getString(R.string.domain_user_insert);
-		findViewById(R.id.buttonResgister).setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				mUserInfo.setName(editTextName.getText().toString());
-				mUserInfo.setEmail(editTextEmail.getText().toString());
-				mUserInfo.setPassword(editTextPassword.getText().toString());
-				new UserRegisterAsyncTask().execute(mUserInfo);
-			}
-		});
+		findViewById(R.id.buttonResgister).setOnClickListener(this);
 	}
 
 	
@@ -159,5 +150,15 @@ public class UserRegisterAcitvity extends Activity {
 		editTextEmail.getText().clear();
 		editTextName.getText().clear();
 		editTextPassword.getText().clear();
+	}
+
+
+	@Override
+	public void onClick(View v) {
+		mUserInfo.setName(editTextName.getText().toString());
+		mUserInfo.setEmail(editTextEmail.getText().toString());
+		mUserInfo.setPassword(editTextPassword.getText().toString());
+		new UserRegisterAsyncTask().execute(mUserInfo);
+		
 	}
 }
