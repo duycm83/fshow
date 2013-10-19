@@ -47,7 +47,6 @@ public class ItemResgisterActivity extends Activity {
 	private Uri outputFileUri;
 	private Uri selectedImageUri;
 	private String mFileUploadName;
-	private int mUserId = 999;
 	/********** File Path *************/
 	final String uploadFilePath = Environment.getExternalStorageDirectory()
 			.getPath();
@@ -64,7 +63,7 @@ public class ItemResgisterActivity extends Activity {
 		/************* Php script path ****************/
 		mUpLoadServerUri = getString(R.string.domain_upload_image);
 
-		mFileUploadName = String.format("%04d%n_%d.jpg", mUserId,
+		mFileUploadName = String.format("%04d%n_%d.jpg", UserLoginActivity.sUserId,
 				System.currentTimeMillis());
 		mButtonUpload.setOnClickListener(new OnClickListener() {
 			@Override
@@ -175,7 +174,7 @@ public class ItemResgisterActivity extends Activity {
 						+ lineEnd);
 				dos.writeBytes("Content-Transfer-Encoding: 8bit" + lineEnd);
 				dos.writeBytes(lineEnd);
-				dos.writeBytes(String.valueOf(mUserId) + lineEnd);
+				dos.writeBytes(String.valueOf(UserLoginActivity.sUserId) + lineEnd);
 
 				// Send parameter #2
 				dos.writeBytes(twoHyphens + boundary + lineEnd);
