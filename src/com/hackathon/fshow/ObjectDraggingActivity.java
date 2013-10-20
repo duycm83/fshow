@@ -1,5 +1,7 @@
 package com.hackathon.fshow;
 
+import org.json.JSONArray;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -12,11 +14,14 @@ import android.view.View.OnTouchListener;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.hackathon.fshow.module.DownloadMapAsyncTask;
+
 public class ObjectDraggingActivity extends RajawaliExampleActivity implements OnTouchListener {
 	private ObjectDraggingRenderer mRenderer;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		mRenderer = new ObjectDraggingRenderer(this);
 		mRenderer.setSurfaceView(mSurfaceView);
 		super.setRenderer(mRenderer);
@@ -35,9 +40,15 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
         
         mLayout.addView(ll);
 		
+        new DownloadMapAsyncTask(this, mRenderer).execute();
 		initLoader();
 	}
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+	}
 	public boolean onTouch(View v, MotionEvent event) {
 		switch(event.getAction())
 		{
@@ -73,5 +84,13 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 	    	startActivity(intent);
 	    }
 	    return true;
+	}
+
+	public void duy(JSONArray items) {
+//		mRenderer = new ObjectDraggingRenderer(this, items);
+//		mRenderer.setSurfaceView(mSurfaceView);
+//		super.setRenderer(mRenderer);
+//		mSurfaceView.setOnTouchListener(this);
+		
 	}
 }

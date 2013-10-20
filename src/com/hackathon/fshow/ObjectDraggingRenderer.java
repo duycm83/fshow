@@ -3,6 +3,8 @@ package com.hackathon.fshow;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import org.json.JSONArray;
+
 import rajawali.BaseObject3D;
 import rajawali.lights.DirectionalLight;
 import rajawali.math.Vector3;
@@ -12,10 +14,13 @@ import rajawali.util.OnObjectPickedListener;
 import android.content.Context;
 import android.graphics.Color;
 import android.opengl.GLU;
+import android.util.Log;
 
 import com.hackathon.fshow.module.AutoGenerateItem;
 
-public class ObjectDraggingRenderer extends RajawaliRenderer implements OnObjectPickedListener {
+public class ObjectDraggingRenderer extends RajawaliRenderer implements
+		OnObjectPickedListener {
+	private static final String TAG = "ObjectDraggingRenderer";
 	private ObjectColorPicker mPicker;
 	private BaseObject3D mSelectedObject;
 	private int[] mViewport;
@@ -27,14 +32,26 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements OnObject
 	private float[] mViewMatrix;
 	private float[] mProjectionMatrix;
 	private Context mContext;
+	private JSONArray mData;
+	DirectionalLight light = new DirectionalLight(0, 0, 1);
+
 	public ObjectDraggingRenderer(Context context) {
 		super(context);
 		this.mContext = context;
 		setFrameRate(60);
 	}
 
+	public ObjectDraggingRenderer(Context context, JSONArray data) {
+		super(context);
+		this.mContext = context;
+		this.mData = data;
+		setFrameRate(60);
+	}
+
+	int TIMEOUT = 60000;
+
 	protected void initScene() {
-		DirectionalLight light = new DirectionalLight(0, 0, 1);
+		Log.v(TAG, "@@@ initScene");
 		light.setColor(Color.BLUE);
 		light.setPower(12);
 		mViewport = new int[] { 0, 0, mViewportWidth, mViewportHeight };
@@ -48,7 +65,26 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements OnObject
 
 		mPicker = new ObjectColorPicker(this);
 		mPicker.setOnObjectPickedListener(this);
-		AutoGenerateItem.addNewObject(mContext, this, mPicker, light);
+		// AutoGenerateItem.addNewObject(mContext, this, mPicker, light);
+		long waitBegin = System.currentTimeMillis();
+
+		do {
+			try {
+				Log.v(TAG, "@@@ wait ...");
+				Thread.sleep(1000);
+				if (System.currentTimeMillis() - waitBegin > TIMEOUT) {
+					Log.v(TAG, "@@@ wait timeout");
+					break;
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} while (mData == null);
+		if (mData != null) {
+			AutoGenerateItem.showItems(mContext, this, mPicker, light, mData);
+		} else {
+			Log.v(TAG, "@@@ data is null");
+		}
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -88,23 +124,26 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements OnObject
 		// -- unproject the screen coordinate (2D) to the camera's far plane
 		//
 
-		result = GLU.gluUnProject(x, mViewportHeight - y, 1.f, mViewMatrix,
-				0, mProjectionMatrix, 0, mViewport, 0, mFarPos4, 0);
+		result = GLU.gluUnProject(x, mViewportHeight - y, 1.f, mViewMatrix, 0,
+				mProjectionMatrix, 0, mViewport, 0, mFarPos4, 0);
 
 		//
 		// -- transform 4D coordinates (x, y, z, w) to 3D (x, y, z) by dividing
-		//    each coordinate (x, y, z) by w.
+		// each coordinate (x, y, z) by w.
 		//
 
-		mNearPos.setAll(mNearPos4[0] / mNearPos4[3], mNearPos4[1] / mNearPos4[3], mNearPos4[2] / mNearPos4[3]);
-		mFarPos.setAll(mFarPos4[0] / mFarPos4[3], mFarPos4[1] / mFarPos4[3], mFarPos4[2] / mFarPos4[3]);
+		mNearPos.setAll(mNearPos4[0] / mNearPos4[3], mNearPos4[1]
+				/ mNearPos4[3], mNearPos4[2] / mNearPos4[3]);
+		mFarPos.setAll(mFarPos4[0] / mFarPos4[3], mFarPos4[1] / mFarPos4[3],
+				mFarPos4[2] / mFarPos4[3]);
 
 		//
 		// -- now get the coordinates for the selected object
 		//
 
 		float factor = (Math.abs(mSelectedObject.getZ()) + mNearPos.z)
-				/ (getCurrentCamera().getFarPlane() - getCurrentCamera().getNearPlane());
+				/ (getCurrentCamera().getFarPlane() - getCurrentCamera()
+						.getNearPlane());
 
 		mNewObjPos.setAllFrom(mFarPos);
 		mNewObjPos.subtract(mNearPos);
@@ -117,5 +156,18 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements OnObject
 
 	public void stopMovingSelectedObject() {
 		mSelectedObject = null;
+	}
+
+	public DirectionalLight getLight() {
+		return light;
+	}
+
+	public ObjectColorPicker getPicker() {
+		return mPicker;
+	}
+
+	public void setData(JSONArray data) {
+		Log.v(TAG, "@@@ setData");
+		this.mData = data;
 	}
 }
