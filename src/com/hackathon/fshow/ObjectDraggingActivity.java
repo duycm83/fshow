@@ -3,32 +3,44 @@ package com.hackathon.fshow;
 import org.json.JSONArray;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.hackathon.fshow.module.DownloadMapAsyncTask;
+import com.hackathon.fshow.module.MyPlane;
 
 public class ObjectDraggingActivity extends RajawaliExampleActivity implements OnTouchListener {
+	private static final String TAG = "ObjectDraggingActivity";
 	private ObjectDraggingRenderer mRenderer;
-	
+	private int mScreenWidth = 0;
+	private int mScreenHeight = 0;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		mScreenWidth = size.x;
+		mScreenHeight = size.y;
 		mRenderer = new ObjectDraggingRenderer(this);
 		mRenderer.setSurfaceView(mSurfaceView);
 		super.setRenderer(mRenderer);
 		mSurfaceView.setOnTouchListener(this);
 		
 		LinearLayout ll = new LinearLayout(this);
-        ll.setOrientation(LinearLayout.VERTICAL);
+		ll.setOrientation(LinearLayout.VERTICAL);
         ll.setGravity(Gravity.BOTTOM);
 
 //        TextView label = new TextView(this);
@@ -37,6 +49,16 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 //        label.setGravity(Gravity.CENTER_HORIZONTAL);
 //        label.setHeight(100);
 //        ll.addView(label);
+        
+//        LinearLayout dropArea = new LinearLayout(this);
+//        dropArea.setBackgroundColor(Color.TRANSPARENT);
+//        dropArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 130));
+//        dropArea.setGravity(Gravity.CENTER_HORIZONTAL);
+       
+        LinearLayout dropArea = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.drag_area, null);
+      dropArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 130));
+      dropArea.setGravity(Gravity.CENTER_HORIZONTAL);
+        ll.addView(dropArea);
         
         mLayout.addView(ll);
 		
@@ -50,17 +72,22 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 		
 	}
 	public boolean onTouch(View v, MotionEvent event) {
-		switch(event.getAction())
-		{
-		case MotionEvent.ACTION_DOWN:
-			mRenderer.getObjectAt(event.getX(), event.getY());
-			break;
-		case MotionEvent.ACTION_MOVE:
-			mRenderer.moveSelectedObject(event.getX(), event.getY());
-			break;
-		case MotionEvent.ACTION_UP:
-			mRenderer.stopMovingSelectedObject();
-			break;
+		float x = event.getX();
+		float y = event.getY();
+		switch(event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				mRenderer.getObjectAt(x, y);
+				break;
+			case MotionEvent.ACTION_MOVE:
+				mRenderer.moveSelectedObject(x, y);
+				if (y > (mScreenHeight -200)) {
+					String name = ((MyPlane)mRenderer.getSelectedObject()).getName();
+					Log.v(TAG, "@@@selected "+name);
+				}
+				break;
+			case MotionEvent.ACTION_UP:
+				mRenderer.stopMovingSelectedObject();
+				break;
 		}
 		return true;
 	}

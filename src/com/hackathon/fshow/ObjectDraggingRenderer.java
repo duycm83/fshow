@@ -170,4 +170,8 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		Log.v(TAG, "@@@ setData");
 		this.mData = data;
 	}
+	
+	public BaseObject3D getSelectedObject() {
+		return mSelectedObject;
+	}
 }

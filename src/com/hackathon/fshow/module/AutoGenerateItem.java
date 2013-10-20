@@ -71,13 +71,13 @@ public class AutoGenerateItem {
 		try {
 			PlanesGaloreMaterial planesGaloreMaterial = new PlanesGaloreMaterial();
 			String name = String.format("image%04d", itemId);
-			Bitmap bmp01 = ImageUtils.decodeToImage(imageBase64);
-			if (bmp01 == null) {
+			Bitmap bmp = ImageUtils.decodeToImage(imageBase64);
+			if (bmp == null) {
 				Log.e(TAG, "@@@error name:" + name);
 				return;
 			}
-			planesGaloreMaterial.addTexture(new Texture("duy", bmp01));
-			Plane plane = new Plane();
+			planesGaloreMaterial.addTexture(new Texture(name, bmp));
+			MyPlane plane = new MyPlane(name, bmp);
 			plane.addLight(light);
 			plane.setMaterial(planesGaloreMaterial);
 			plane.setColor(0x333333 + (int) (Math.random() * 0xcccccc));
