@@ -76,6 +76,8 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 		super.onResume();
 		
 	}
+	float objx, objy, objz;
+	boolean isMoveFirst =false;
 	boolean isInDropArea = false;
 	public boolean onTouch(View v, MotionEvent event) {
 		float x = event.getX();
@@ -86,6 +88,14 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 				break;
 			case MotionEvent.ACTION_MOVE:
 				mRenderer.moveSelectedObject(x, y);
+				if (mRenderer.getSelectedObject() == null) {
+					return true;
+				} else if (isMoveFirst == false) {
+					objx = mRenderer.getSelectedObject().getX();
+					objy = mRenderer.getSelectedObject().getY();
+					objz = mRenderer.getSelectedObject().getZ();
+					isMoveFirst = true;
+				}
 				if (y > (mScreenHeight -200)) {
 					if(isInDropArea == false) {
 						vibrate();
@@ -103,6 +113,10 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 					ImageView imageView = new ImageView(this);
 					imageView.setImageBitmap(bm);
 					dropArea.addView(imageView);
+					mRenderer.getSelectedObject().setX(objx);
+					mRenderer.getSelectedObject().setY(objy);
+					mRenderer.getSelectedObject().setZ(objz);
+					isMoveFirst = false;
 				}
 				mRenderer.stopMovingSelectedObject();
 				break;
