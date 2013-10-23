@@ -31,7 +31,11 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 	private ObjectDraggingRenderer mRenderer;
 	private int mScreenWidth = 0;
 	private int mScreenHeight = 0;
-	LinearLayout dropArea = null;
+	private LinearLayout dropArea = null;
+	private float objx, objy, objz;
+	private boolean isMoveFirst =false;
+	private boolean isInDropArea = false;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Display display = getWindowManager().getDefaultDisplay();
@@ -76,9 +80,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 		super.onResume();
 		
 	}
-	float objx, objy, objz;
-	boolean isMoveFirst =false;
-	boolean isInDropArea = false;
+	
 	public boolean onTouch(View v, MotionEvent event) {
 		float x = event.getX();
 		float y = event.getY();
@@ -108,7 +110,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements O
 				}
 				break;
 			case MotionEvent.ACTION_UP:
-				if (isInDropArea) {
+				if (isInDropArea && mRenderer.getSelectedObject() != null) {
 					Bitmap bm = ((MyPlane)mRenderer.getSelectedObject()).getBitmap();
 					ImageView imageView = new ImageView(this);
 					imageView.setImageBitmap(bm);
