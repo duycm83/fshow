@@ -63,7 +63,7 @@ public class ItemResgisterActivity extends Activity {
 		/************* Php script path ****************/
 		mUpLoadServerUri = getString(R.string.domain_upload_image);
 
-		mFileUploadName = String.format("%04d%n_%d.jpg", UserLoginActivity.sUserId,
+		mFileUploadName = String.format("%04d%n_%d.jpg", Integer.valueOf(ObjectDraggingActivity.sUserId),
 				System.currentTimeMillis());
 		mButtonUpload.setOnClickListener(new OnClickListener() {
 			@Override
@@ -174,7 +174,7 @@ public class ItemResgisterActivity extends Activity {
 						+ lineEnd);
 				dos.writeBytes("Content-Transfer-Encoding: 8bit" + lineEnd);
 				dos.writeBytes(lineEnd);
-				dos.writeBytes(String.valueOf(UserLoginActivity.sUserId) + lineEnd);
+				dos.writeBytes(ObjectDraggingActivity.sUserId + lineEnd);
 
 				// Send parameter #2
 				dos.writeBytes(twoHyphens + boundary + lineEnd);

@@ -1,9 +1,6 @@
 package com.hackathon.fshow.module;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -13,69 +10,52 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import rajawali.lights.DirectionalLight;
-import rajawali.util.ObjectColorPicker;
-import android.opengl.GLSurfaceView;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.hackathon.fshow.ObjectDraggingActivity;
 import com.hackathon.fshow.ObjectDraggingRenderer;
 
 public class DownloadMapAsyncTask extends AsyncTask<String, Integer, String> {
 	private static final String TAG = "DownloadMapAsyncTask";
-	private ObjectDraggingActivity mContext;
 	private ObjectDraggingRenderer mRenderer;
-	private ObjectColorPicker mPicker;
-	private DirectionalLight mLight;
-	
+	private ProgressDialog dialog = null;
+	private Context mContext = null;
 	//@see http://techbooster.org/android/application/1645/
 	private String mMapAccessUrl = "http://133.242.168.69/team_h/fshow/develop/fashion/MapAccess.php";
-	private GLSurfaceView mSurfaceView;
 	
-	public DownloadMapAsyncTask(ObjectDraggingActivity context, ObjectDraggingRenderer renderer, ObjectColorPicker picker, DirectionalLight light) {
-		this.mContext = context;
+	public DownloadMapAsyncTask(Context context, ObjectDraggingRenderer renderer) {
 		this.mRenderer = renderer;
-		this.mPicker = picker;
-		this.mLight = light;
+		this.mContext = context;
+	}
+
+	@Override
+	protected void onPreExecute() {
+		super.onPreExecute();
+		dialog = new ProgressDialog(mContext);
+		dialog.setMessage("Loading...");
+		dialog.show();
 	}
 	
-	public DownloadMapAsyncTask(ObjectDraggingActivity context, ObjectDraggingRenderer renderer) {
-		this.mContext = context;
-		this.mRenderer = renderer;
-//		this.mPicker = renderer.getPicker();
-//		this.mLight = renderer.getLight();
+	@Override
+	protected void onPostExecute(String result) {
+		if (result != null) {
+			dialog.setMessage("loading completed");
+		} else {
+			dialog.setMessage("loading failure");
+		}
+		dialog.dismiss();
+		super.onPostExecute(result);
 	}
-	
-	
-//	@Override
-//	protected void onPostExecute(String result) {
-//		this.mPicker = mRenderer.getPicker();
-//		this.mLight = mRenderer.getLight();
-//		if (result != null) {
-//			try {
-//				JSONObject rootObject = new JSONObject(result);
-//				JSONArray items = rootObject.getJSONArray("items");
-//				int size = items.length();
-//				for (int i = 0; i < size; i++) {
-//					JSONArray item = items.getJSONArray(i);
-//					int itemId = item.getInt(0);
-//					int userId = item.getInt(1);
-//					String imageBase64 = item.getString(2);
-//					Log.v(TAG, "@@@ itemId:"+itemId);
-//					Log.v(TAG, "@@@ userId:"+userId);
-//					Log.v(TAG, "@@@ imageBase64:"+imageBase64.substring(0, 20));
-//					AutoGenerateItem.addNewItem(mContext, mRenderer, mPicker, mLight, itemId, imageBase64);
-//				}
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		super.onPostExecute(result);
-//	}
 	
 	@Override
 	protected String doInBackground(String... params) {
+		
+		if (params != null && params.length == 1) {
+			Log.v(TAG, "@@@ userid="+params[0]);
+			mMapAccessUrl += "?userid="+params[0];
+		}
 		String jsonResult = null;
 		HttpClient httpClient = new DefaultHttpClient();
 		 
@@ -97,31 +77,23 @@ public class DownloadMapAsyncTask extends AsyncTask<String, Integer, String> {
 		        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		        httpResponse.getEntity().writeTo(outputStream);
 		        jsonResult = outputStream.toString(); // JSONデータ
-		        //Log.v(TAG, "@@@ jsonresult:"+jsonResult);
-		        Log.v(TAG, "@@@ jsonresult OK");
-		        JSONObject rootObject = new JSONObject(jsonResult);
-				JSONArray items = rootObject.getJSONArray("items");
-				mRenderer.setData(items);
+		        if (jsonResult != null) {
+			        //Log.v(TAG, "@@@ jsonresult:"+jsonResult);
+			        Log.v(TAG, "@@@ jsonresult OK");
+			        JSONObject rootObject = new JSONObject(jsonResult);
+					JSONArray items = rootObject.getJSONArray("items");
+					mRenderer.setData(items);
+		        } 
+	        	mRenderer.refresh();
 		    } catch (Exception e) {
 		          Log.d("JSONSampleActivity", "Error");
+		          mRenderer.refresh();
 		    }
 		} else {
 		    Log.d("JSONSampleActivity", "Status" + status);
 		    return jsonResult;
 		}
 		return jsonResult;
-	}
-	
-	
-	private InputStream getStream(String url) {
-	    try {
-	        URL link = new URL(url);
-	        URLConnection urlConnection = link.openConnection();
-	        urlConnection.setConnectTimeout(1000);
-	        return urlConnection.getInputStream();
-	    } catch (Exception ex) {
-	        return null;
-	    }
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.hackathon.fshow;
 
+import java.util.ArrayList;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -33,6 +35,7 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 	private float[] mProjectionMatrix;
 	private Context mContext;
 	private JSONArray mData;
+	public boolean isRefresh = false;
 	DirectionalLight light = new DirectionalLight(0, 0, 1);
 
 	public ObjectDraggingRenderer(Context context) {
@@ -66,24 +69,33 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		mPicker = new ObjectColorPicker(this);
 		mPicker.setOnObjectPickedListener(this);
 		// AutoGenerateItem.addNewObject(mContext, this, mPicker, light);
-		long waitBegin = System.currentTimeMillis();
-
-		do {
-			try {
-				Log.v(TAG, "@@@ wait ...");
-				Thread.sleep(1000);
-				if (System.currentTimeMillis() - waitBegin > TIMEOUT) {
-					Log.v(TAG, "@@@ wait timeout");
-					break;
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		} while (mData == null);
-		if (mData != null) {
-			AutoGenerateItem.showItems(mContext, this, mPicker, light, mData);
-		} else {
-			Log.v(TAG, "@@@ data is null");
+//		long waitBegin = System.currentTimeMillis();
+//
+//		do {
+//			try {
+//				Log.v(TAG, "@@@ wait ...");
+//				Thread.sleep(1000);
+//				if (System.currentTimeMillis() - waitBegin > TIMEOUT) {
+//					Log.v(TAG, "@@@ wait timeout");
+//					break;
+//				}
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		} while (mData == null);
+//		if (mData != null) {
+//			AutoGenerateItem.showItems(mContext, this, mPicker, light, mData);
+//		} else {
+//			Log.v(TAG, "@@@ data is null");
+//		}
+	}
+	
+	@Override
+	public void onDrawFrame(GL10 glUnused) {
+		super.onDrawFrame(glUnused);
+		if (isRefresh) {
+			addAdummy();
+			isRefresh = false;
 		}
 	}
 
@@ -173,5 +185,27 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 	
 	public BaseObject3D getSelectedObject() {
 		return mSelectedObject;
+	}
+	private ArrayList<BaseObject3D> mListChild = new ArrayList<BaseObject3D>();
+	@Override
+	public boolean addChild(BaseObject3D child) {
+		mListChild.add(child);
+		return super.addChild(child);
+	}
+	
+	public void removeAllChild() {
+		for (BaseObject3D item : mListChild) {
+			removeChild(item);
+		}
+		mListChild.clear();
+	}
+	
+	public void addAdummy() {
+		AutoGenerateItem.showItems(mContext, this, mPicker, light, mData);
+	}
+
+	public void refresh() {
+		removeAllChild();
+		isRefresh = true;
 	}
 }

@@ -32,7 +32,6 @@ public class UserLoginActivity extends Activity implements OnClickListener {
 	
 	private static final String TAG = "UserLoginActivity";
 	private String mLoginActionUrl = "http://133.242.168.69/team_h/fshow/develop/fashion/LoginAction.php";
-	public static int sUserId = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,17 +91,11 @@ public class UserLoginActivity extends Activity implements OnClickListener {
 					if (entity != null) {
 				        // EntityUtils to get the reponse content
 				        String content =  EntityUtils.toString(entity);
-				        sUserId = 0; //reset
-				        try {
-				        	sUserId = Integer.valueOf(content);
-				        } catch (NumberFormatException e) {
-				        	e.printStackTrace();
-				        } catch (NullPointerException e) {
-				        	e.printStackTrace();
-				        }
+				        ObjectDraggingActivity.sUserId = "0"; //reset
 				        Log.v(TAG, "@@@ content:"+content);
-				        if (sUserId != 0) {
+				        if ("0".equals(content) == false) {
 				        	result = true;
+				        	ObjectDraggingActivity.sUserId = content;
 				        }
 					}
 				} catch (ParseException e) {
