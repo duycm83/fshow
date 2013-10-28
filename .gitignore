@@ -3,4 +3,5 @@ gen/
 proguard/
 .DS_Store
 Thumbs.db
+project.properties
 
