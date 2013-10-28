@@ -51,15 +51,15 @@ public class DownloadMapAsyncTask extends AsyncTask<String, Integer, String> {
 	
 	@Override
 	protected String doInBackground(String... params) {
-		
+		String url = mMapAccessUrl;
 		if (params != null && params.length == 1) {
 			Log.v(TAG, "@@@ userid="+params[0]);
-			mMapAccessUrl += "?userid="+params[0];
+			url = mMapAccessUrl + "?userid="+params[0];
 		}
 		String jsonResult = null;
 		HttpClient httpClient = new DefaultHttpClient();
 		 
-		StringBuilder uri = new StringBuilder(mMapAccessUrl);
+		StringBuilder uri = new StringBuilder(url);
 		HttpGet request = new HttpGet(uri.toString());
 		HttpResponse httpResponse = null;
 		 
@@ -83,8 +83,8 @@ public class DownloadMapAsyncTask extends AsyncTask<String, Integer, String> {
 			        JSONObject rootObject = new JSONObject(jsonResult);
 					JSONArray items = rootObject.getJSONArray("items");
 					mRenderer.setData(items);
+					mRenderer.refresh();
 		        } 
-	        	mRenderer.refresh();
 		    } catch (Exception e) {
 		          Log.d("JSONSampleActivity", "Error");
 		          mRenderer.refresh();

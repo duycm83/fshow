@@ -183,13 +183,9 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (backcount == 0) {
+			if (backcount == 0 || (System.currentTimeMillis() - backcount > 2000)) {
 				Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
 				backcount = System.currentTimeMillis();
-				return true;
-			} else if (System.currentTimeMillis() - backcount > 2000) {
-				backcount = System.currentTimeMillis();
-				Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
 				return true;
 			}
 		}

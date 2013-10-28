@@ -205,7 +205,7 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 	}
 
 	public void refresh() {
-		removeAllChild();
 		isRefresh = true;
+		removeAllChild();
 	}
 }
