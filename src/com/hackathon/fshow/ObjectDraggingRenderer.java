@@ -94,7 +94,7 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 	public void onDrawFrame(GL10 glUnused) {
 		super.onDrawFrame(glUnused);
 		if (isRefresh) {
-			addAdummy();
+			showItems(mData);
 			isRefresh = false;
 		}
 	}
@@ -200,12 +200,12 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		mListChild.clear();
 	}
 	
-	public void addAdummy() {
-		AutoGenerateItem.showItems(mContext, this, mPicker, light, mData);
+	public void showItems(JSONArray data) {
+		removeAllChild();
+		AutoGenerateItem.showItems(mContext, this, mPicker, light, data);
 	}
 
 	public void refresh() {
 		isRefresh = true;
-		removeAllChild();
 	}
 }

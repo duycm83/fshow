@@ -35,7 +35,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 	private float objx, objy, objz;
 	private boolean isMoveFirst = false;
 	private boolean isInDropArea = false;
-	public static String sUserId;
+	public static String sUserId = "0";
 	private int mScreenType = 1; //1=all; 2=mine
 	
 	public void onCreate(Bundle savedInstanceState) {

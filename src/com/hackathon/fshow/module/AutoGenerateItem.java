@@ -48,7 +48,7 @@ public class AutoGenerateItem {
 	public static void showItems(Context context,
 			ObjectDraggingRenderer renderer, ObjectColorPicker picker,
 			DirectionalLight light, JSONArray mData) {
-
+		if (mData == null) return;
 		try {
 			int size = mData.length();
 			for (int i = 0; i < size; i++) {
