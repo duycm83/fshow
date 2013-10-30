@@ -8,6 +8,9 @@ import javax.microedition.khronos.opengles.GL10;
 import org.json.JSONArray;
 
 import rajawali.BaseObject3D;
+import rajawali.animation.Animation3D.RepeatMode;
+import rajawali.animation.CatmullRomPath3D;
+import rajawali.animation.TranslateAnimation3D;
 import rajawali.lights.DirectionalLight;
 import rajawali.math.Vector3;
 import rajawali.renderer.RajawaliRenderer;
@@ -17,6 +20,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.opengl.GLU;
 import android.util.Log;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.hackathon.fshow.module.AutoGenerateItem;
 
@@ -52,6 +56,7 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 	}
 
 	int TIMEOUT = 60000;
+	private TranslateAnimation3D mCamAnim;
 
 	protected void initScene() {
 		Log.v(TAG, "@@@ initScene");
@@ -68,26 +73,26 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 
 		mPicker = new ObjectColorPicker(this);
 		mPicker.setOnObjectPickedListener(this);
-		// AutoGenerateItem.addNewObject(mContext, this, mPicker, light);
-//		long waitBegin = System.currentTimeMillis();
-//
-//		do {
-//			try {
-//				Log.v(TAG, "@@@ wait ...");
-//				Thread.sleep(1000);
-//				if (System.currentTimeMillis() - waitBegin > TIMEOUT) {
-//					Log.v(TAG, "@@@ wait timeout");
-//					break;
-//				}
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		} while (mData == null);
-//		if (mData != null) {
-//			AutoGenerateItem.showItems(mContext, this, mPicker, light, mData);
-//		} else {
-//			Log.v(TAG, "@@@ data is null");
-//		}
+		
+		
+		CatmullRomPath3D path = new CatmullRomPath3D();
+		path.addPoint(new Vector3(-4, 0, -2));
+		path.addPoint(new Vector3(2, 1, -1));
+		path.addPoint(new Vector3(-2, 0, 1));
+		path.addPoint(new Vector3(0, -4, 2));
+		path.addPoint(new Vector3(5, 10, 3));
+		path.addPoint(new Vector3(-2, 5, 4));
+		path.addPoint(new Vector3(3, -1, 6));
+		path.addPoint(new Vector3(5, -1, 7));
+		
+		mCamAnim = new TranslateAnimation3D(path);
+		mCamAnim.setDuration(20000);
+		mCamAnim.setRepeatMode(RepeatMode.REVERSE_INFINITE);
+		mCamAnim.setTransformable3D(getCurrentCamera());
+		mCamAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+		registerAnimation(mCamAnim);
+		
+		getCurrentCamera().setLookAt(new Vector3(0,0,-2));	
 	}
 	
 	@Override
@@ -111,6 +116,7 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		((RajawaliExampleActivity) mContext).showLoader();
 		super.onSurfaceCreated(gl, config);
 		((RajawaliExampleActivity) mContext).hideLoader();
+		mCamAnim.play();
 	}
 
 	public void getObjectAt(float x, float y) {
