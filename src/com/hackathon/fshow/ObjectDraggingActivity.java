@@ -81,15 +81,15 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-                if (slideOffset < 0.2) {
-                    if (getActionBar().isShowing()) {
-                        getActionBar().hide();
-                    }
-                } else {
-                    if (!getActionBar().isShowing()) {
-                        getActionBar().show();
-                    }
-                }
+//                if (slideOffset < 0.2) {
+//                    if (getActionBar().isShowing()) {
+//                        getActionBar().hide();
+//                    }
+//                } else {
+//                    if (!getActionBar().isShowing()) {
+//                        getActionBar().show();
+//                    }
+//                }
             }
 
             @Override
