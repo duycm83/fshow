@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import rajawali.lights.DirectionalLight;
+import rajawali.materials.Material;
+import rajawali.materials.methods.DiffuseMethod;
 import rajawali.materials.textures.ATexture.TextureException;
 import rajawali.materials.textures.Texture;
 import rajawali.util.ObjectColorPicker;
@@ -13,7 +15,6 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.hackathon.fshow.ObjectDraggingRenderer;
-import com.hackathon.fshow.planes.PlanesGaloreMaterial;
 
 public class AutoGenerateItem {
 
@@ -23,18 +24,24 @@ public class AutoGenerateItem {
 			ObjectColorPicker picker, DirectionalLight light, int itemId,
 			String imageBase64) {
 		try {
-			PlanesGaloreMaterial planesGaloreMaterial = new PlanesGaloreMaterial();
+			Material material = new Material();
+			material.enableLighting(true);
+			material.setDiffuseMethod(new DiffuseMethod.Lambert());
 			String name = String.format("image%04d", itemId);
 			Bitmap bmp = ImageUtils.decodeToImage(imageBase64);
 			if (bmp == null) {
 				Log.e(TAG, "@@@error name:" + name);
 				return;
 			}
-			planesGaloreMaterial.addTexture(new Texture(name, bmp));
+			Texture texture = new Texture(name, bmp);
+			texture.setMipmap(false);
+			texture.shouldRecycle(true);
+			material.addTexture(texture);
+			material.setColorInfluence(0);
 			MyPlane plane = new MyPlane(name, bmp);
-			plane.addLight(light);
-			plane.setMaterial(planesGaloreMaterial);
-			plane.setColor(0x333333 + (int) (Math.random() * 0xcccccc));
+			plane.setDoubleSided(true);
+			plane.setRotY(180);
+			plane.setMaterial(material);
 			plane.setX(-4 + (float) (Math.random() * 8));
 			plane.setY(-4 + (float) (Math.random() * 8));
 			plane.setZ(-2 + (float) (Math.random() * -6));

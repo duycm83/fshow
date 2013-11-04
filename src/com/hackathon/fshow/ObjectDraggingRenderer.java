@@ -2,69 +2,48 @@ package com.hackathon.fshow;
 
 import java.util.ArrayList;
 
-import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import org.json.JSONArray;
 
-import rajawali.BaseObject3D;
-import rajawali.animation.Animation3D.RepeatMode;
-import rajawali.animation.CatmullRomPath3D;
-import rajawali.animation.TranslateAnimation3D;
+import rajawali.Object3D;
 import rajawali.lights.DirectionalLight;
-import rajawali.math.Vector3;
+import rajawali.math.Matrix4;
+import rajawali.math.vector.Vector3;
 import rajawali.renderer.RajawaliRenderer;
+import rajawali.util.GLU;
 import rajawali.util.ObjectColorPicker;
 import rajawali.util.OnObjectPickedListener;
 import android.content.Context;
-import android.graphics.Color;
-import android.opengl.GLU;
 import android.util.Log;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.hackathon.fshow.module.AutoGenerateItem;
 
 public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		OnObjectPickedListener {
 	private static final String TAG = "ObjectDraggingRenderer";
-	private ObjectColorPicker mPicker;
-	private BaseObject3D mSelectedObject;
-	private int[] mViewport;
-	private float[] mNearPos4;
-	private float[] mFarPos4;
-	private Vector3 mNearPos;
-	private Vector3 mFarPos;
-	private Vector3 mNewObjPos;
-	private float[] mViewMatrix;
-	private float[] mProjectionMatrix;
-	private Context mContext;
-	private JSONArray mData;
-	public boolean isRefresh = false;
-	DirectionalLight light = new DirectionalLight(0, 0, 1);
 
 	public ObjectDraggingRenderer(Context context) {
 		super(context);
-		this.mContext = context;
 		setFrameRate(60);
 	}
 
-	public ObjectDraggingRenderer(Context context, JSONArray data) {
-		super(context);
-		this.mContext = context;
-		this.mData = data;
-		setFrameRate(60);
-	}
-
-	int TIMEOUT = 60000;
-	private TranslateAnimation3D mCamAnim;
+	private ObjectColorPicker mPicker;
+	private Object3D mSelectedObject;
+	private int[] mViewport;
+	private double[] mNearPos4;
+	private double[] mFarPos4;
+	private Vector3 mNearPos;
+	private Vector3 mFarPos;
+	private Vector3 mNewObjPos;
+	private Matrix4 mViewMatrix;
+	private Matrix4 mProjectionMatrix;
+	private JSONArray mData;
 
 	protected void initScene() {
-		Log.v(TAG, "@@@ initScene");
-		light.setColor(Color.BLUE);
-		light.setPower(12);
 		mViewport = new int[] { 0, 0, mViewportWidth, mViewportHeight };
-		mNearPos4 = new float[4];
-		mFarPos4 = new float[4];
+		mNearPos4 = new double[4];
+		mFarPos4 = new double[4];
 		mNearPos = new Vector3();
 		mFarPos = new Vector3();
 		mNewObjPos = new Vector3();
@@ -73,35 +52,38 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 
 		mPicker = new ObjectColorPicker(this);
 		mPicker.setOnObjectPickedListener(this);
-		
-		
-		CatmullRomPath3D path = new CatmullRomPath3D();
-		path.addPoint(new Vector3(-4, 0, -2));
-		path.addPoint(new Vector3(2, 1, -1));
-		path.addPoint(new Vector3(-2, 0, 1));
-		path.addPoint(new Vector3(0, -4, 2));
-		path.addPoint(new Vector3(5, 10, 3));
-		path.addPoint(new Vector3(-2, 5, 4));
-		path.addPoint(new Vector3(3, -1, 6));
-		path.addPoint(new Vector3(5, -1, 7));
-		
-		mCamAnim = new TranslateAnimation3D(path);
-		mCamAnim.setDuration(20000);
-		mCamAnim.setRepeatMode(RepeatMode.REVERSE_INFINITE);
-		mCamAnim.setTransformable3D(getCurrentCamera());
-		mCamAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-		registerAnimation(mCamAnim);
-		
-		getCurrentCamera().setLookAt(new Vector3(0,0,-2));	
-	}
-	
-	@Override
-	public void onDrawFrame(GL10 glUnused) {
-		super.onDrawFrame(glUnused);
-		if (isRefresh) {
-			showItems(mData);
-			isRefresh = false;
-		}
+
+//		try {
+//			Material material = new Material();
+//			material.enableLighting(true);
+//			material.setDiffuseMethod(new DiffuseMethod.Lambert());
+//			material.addTexture(new Texture("rajawaliTex",
+//					R.drawable.ic_launcher));
+//			material.setColorInfluence(0);
+//			for (int i = 0; i < 20; i++) {
+//				Plane plane = new Plane();
+//				plane.setDoubleSided(true);
+//				plane.setMaterial(material);
+//				plane.setX(-4 + (Math.random() * 8));
+//				plane.setY(-4 + (Math.random() * 8));
+//				plane.setZ(-2 + (Math.random() * -6));
+//				plane.setRotY(180);
+//				mPicker.registerObject(plane);
+//				addChild(plane);
+//
+//				// Sphere sphere = new Sphere(.3f, 12, 12);
+//				// sphere.setMaterial(material);
+//				// sphere.setColor(0x333333 + (int) (Math.random() * 0xcccccc));
+//				// sphere.setX(-4 + (Math.random() * 8));
+//				// sphere.setY(-4 + (Math.random() * 8));
+//				// sphere.setZ(-2 + (Math.random() * -6));
+//				// sphere.setDrawingMode(GLES20.GL_LINE_LOOP);
+//				// mPicker.registerObject(sphere);
+//				// addChild(sphere);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -112,18 +94,19 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		mProjectionMatrix = getCurrentCamera().getProjectionMatrix();
 	}
 
-	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		((RajawaliExampleActivity) mContext).showLoader();
-		super.onSurfaceCreated(gl, config);
-		((RajawaliExampleActivity) mContext).hideLoader();
-		mCamAnim.play();
+	@Override
+	public void onDrawFrame(GL10 glUnused) {
+		super.onDrawFrame(glUnused);
+		if (isRefresh) {
+			showItems(mData);
+			isRefresh = false;
+		}
 	}
-
 	public void getObjectAt(float x, float y) {
 		mPicker.getObjectAt(x, y);
 	}
 
-	public void onObjectPicked(BaseObject3D object) {
+	public void onObjectPicked(Object3D object) {
 		mSelectedObject = object;
 	}
 
@@ -135,15 +118,19 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		// -- unproject the screen coordinate (2D) to the camera's near plane
 		//
 
-		int result = GLU.gluUnProject(x, mViewportHeight - y, 0, mViewMatrix,
-				0, mProjectionMatrix, 0, mViewport, 0, mNearPos4, 0);
+		GLU.gluUnProject(x, mViewportHeight - y, 0,
+				mViewMatrix.getDoubleValues(), 0,
+				mProjectionMatrix.getDoubleValues(), 0, mViewport, 0,
+				mNearPos4, 0);
 
 		//
 		// -- unproject the screen coordinate (2D) to the camera's far plane
 		//
 
-		result = GLU.gluUnProject(x, mViewportHeight - y, 1.f, mViewMatrix, 0,
-				mProjectionMatrix, 0, mViewport, 0, mFarPos4, 0);
+		GLU.gluUnProject(x, mViewportHeight - y, 1.f,
+				mViewMatrix.getDoubleValues(), 0,
+				mProjectionMatrix.getDoubleValues(), 0, mViewport, 0, mFarPos4,
+				0);
 
 		//
 		// -- transform 4D coordinates (x, y, z, w) to 3D (x, y, z) by dividing
@@ -159,11 +146,11 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		// -- now get the coordinates for the selected object
 		//
 
-		float factor = (Math.abs(mSelectedObject.getZ()) + mNearPos.z)
+		double factor = (Math.abs(mSelectedObject.getZ()) + mNearPos.z)
 				/ (getCurrentCamera().getFarPlane() - getCurrentCamera()
 						.getNearPlane());
 
-		mNewObjPos.setAllFrom(mFarPos);
+		mNewObjPos.setAll(mFarPos);
 		mNewObjPos.subtract(mNearPos);
 		mNewObjPos.multiply(factor);
 		mNewObjPos.add(mNearPos);
@@ -176,9 +163,9 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		mSelectedObject = null;
 	}
 
-	public DirectionalLight getLight() {
-		return light;
-	}
+//	public DirectionalLight getLight() {
+//		return light;
+//	}
 
 	public ObjectColorPicker getPicker() {
 		return mPicker;
@@ -188,24 +175,29 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		Log.v(TAG, "@@@ setData");
 		this.mData = data;
 	}
-	
-	public BaseObject3D getSelectedObject() {
+
+	public Object3D getSelectedObject() {
 		return mSelectedObject;
 	}
-	private ArrayList<BaseObject3D> mListChild = new ArrayList<BaseObject3D>();
+
+	private ArrayList<Object3D> mListChild = new ArrayList<Object3D>();
+	private DirectionalLight light;
+	private boolean isRefresh;
+	private Object mCamAnim;
+
 	@Override
-	public boolean addChild(BaseObject3D child) {
+	public boolean addChild(Object3D child) {
 		mListChild.add(child);
 		return super.addChild(child);
 	}
-	
+
 	public void removeAllChild() {
-		for (BaseObject3D item : mListChild) {
+		for (Object3D item : mListChild) {
 			removeChild(item);
 		}
 		mListChild.clear();
 	}
-	
+
 	public void showItems(JSONArray data) {
 		removeAllChild();
 		AutoGenerateItem.showItems(mContext, this, mPicker, light, data);
@@ -214,13 +206,13 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 	public void refresh() {
 		isRefresh = true;
 	}
-	
+
 	public void pauseCamAnim() {
-		mCamAnim.pause();
+//		mCamAnim.pause();
 	}
-	
+
 	public void playCamAnim() {
-		mCamAnim.play();
+//		mCamAnim.play();
 	}
-	
+
 }

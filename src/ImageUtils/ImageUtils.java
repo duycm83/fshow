@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.util.Base64;
 import android.util.Log;
 
@@ -27,7 +28,11 @@ public class ImageUtils {
 		try {
 			imageByte = Base64.decode(imageString, Base64.DEFAULT);
 			ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-			image = BitmapFactory.decodeStream(bis);
+			Options imageOptions = new BitmapFactory.Options();
+	        imageOptions.inSampleSize = 1;
+	        imageOptions.inPurgeable = true;
+	        imageOptions.inInputShareable = true;
+			image = BitmapFactory.decodeStream(bis, null, imageOptions);
 			bis.close();
 		} catch (Exception e) {
 			e.printStackTrace();

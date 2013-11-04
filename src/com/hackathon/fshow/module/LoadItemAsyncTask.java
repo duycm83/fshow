@@ -1,6 +1,7 @@
 package com.hackathon.fshow.module;
 
 import rajawali.lights.DirectionalLight;
+import rajawali.materials.Material;
 import rajawali.materials.textures.ATexture.TextureException;
 import rajawali.materials.textures.Texture;
 import rajawali.primitives.Plane;
@@ -10,7 +11,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
 import com.hackathon.fshow.ObjectDraggingRenderer;
-import com.hackathon.fshow.planes.PlanesGaloreMaterial;
 
 public class LoadItemAsyncTask extends AsyncTask<String, Integer, Boolean> {
 
@@ -35,11 +35,12 @@ public class LoadItemAsyncTask extends AsyncTask<String, Integer, Boolean> {
 			String imageString = params[i];
 			Bitmap bmp = ImageUtils.decodeToImage(imageString);
 			Texture texture = new Texture("texture", bmp);
-			PlanesGaloreMaterial planesGaloreMaterial = new PlanesGaloreMaterial();
+			Material planesGaloreMaterial = new Material();
 			try {
 				planesGaloreMaterial.addTexture(texture);
 				Plane plane = new Plane();
-				plane.addLight(mLight);
+				plane.setDoubleSided(true);
+				plane.setRotY(180);
 				plane.setMaterial(planesGaloreMaterial);
 				plane.setColor(0x333333 + (int) (Math.random() * 0xcccccc));
 				plane.setX(-4 + (float) (Math.random() * 8));

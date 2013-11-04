@@ -36,7 +36,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 	private int mScreenWidth = 0;
 	private int mScreenHeight = 0;
 	private LinearLayout dropArea = null;
-	private float objx, objy, objz;
+	private double objx, objy, objz;
 	private boolean isMoveFirst = false;
 	private boolean isInDropArea = false;
 	public static String sUserId = "0";
