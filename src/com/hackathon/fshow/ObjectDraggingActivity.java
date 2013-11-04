@@ -40,8 +40,8 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 	private boolean isMoveFirst = false;
 	private boolean isInDropArea = false;
 	public static String sUserId = "0";
-	private int mScreenType = 1; //1=all; 2=mine
-	
+	private int mScreenType = 1; // 1=all; 2=mine
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Display display = getWindowManager().getDefaultDisplay();
@@ -74,64 +74,72 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 		dropArea = (LinearLayout) dragArea.findViewById(R.id.dropArea);
 		mLayout.addView(ll);
 
-		SlidingUpPanelLayout layout = (SlidingUpPanelLayout) mLayout.findViewById(R.id.sliding_layout);
-        layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
-        layout.setAnchorPoint(0.3f);
-        layout.setPanelSlideListener(new PanelSlideListener() {
+		SlidingUpPanelLayout layout = (SlidingUpPanelLayout) mLayout
+				.findViewById(R.id.sliding_layout);
+		layout.setShadowDrawable(getResources().getDrawable(
+				R.drawable.above_shadow));
+		layout.setAnchorPoint(0.3f);
+		layout.setPanelSlideListener(new PanelSlideListener() {
+			@Override
+			public void onPanelSlide(View panel, float slideOffset) {
+				Log.v(TAG, "@@@onPanelSlide ");
+				// if (slideOffset < 0.2) {
+				// if (getActionBar().isShowing()) {
+				// getActionBar().hide();
+				// }
+				// }
+				// else {
+				// if (!getActionBar().isShowing()) {
+				// getActionBar().show();
+				// }
+				// }
 
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-//                if (slideOffset < 0.2) {
-//                    if (getActionBar().isShowing()) {
-//                        getActionBar().hide();
-//                    }
-//                } else {
-//                    if (!getActionBar().isShowing()) {
-//                        getActionBar().show();
-//                    }
-//                }
-            }
+//				if (slideOffset < 0.2) {
+//					panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
+//				} else {
+//					panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
+//				}
+			}
 
-            @Override
-            public void onPanelExpanded(View panel) {
+			@Override
+			public void onPanelExpanded(View panel) {
+				Log.v(TAG, "@@@onPanelExpanded ");
+				panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
+			}
 
+			@Override
+			public void onPanelCollapsed(View panel) {
+				Log.v(TAG, "@@@onPanelCollapsed");
+				panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
+			}
 
-            }
+			@Override
+			public void onPanelAnchored(View panel) {
+				Log.v(TAG, "@@@onPanelAnchored");
+			}
+		}); 
+		TextView t = (TextView) mLayout.findViewById(R.id.brought_by);
+		t.setMovementMethod(LinkMovementMethod.getInstance());
 
-            @Override
-            public void onPanelCollapsed(View panel) {
+		TextView content = (TextView) layout.findViewById(R.id.content);
+		content.setOnTouchListener(new OnTouchListener() {
 
-
-            }
-
-            @Override
-            public void onPanelAnchored(View panel) {
-
-
-            }
-        });
-        TextView t = (TextView) mLayout.findViewById(R.id.brought_by);
-        t.setMovementMethod(LinkMovementMethod.getInstance());
-        
-        TextView content = (TextView) layout.findViewById(R.id.content);
-        content.setOnTouchListener(new OnTouchListener() {
-			
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				Log.v(TAG, "@@@ touch content");
 				return ObjectDraggingActivity.this.onTouch(v, event);
 			}
 		});
-        
-//        layout.setOnTouchListener(new OnTouchListener() {
-//			
-//			@Override
-//			public boolean onTouch(View v, MotionEvent event) {
-//				Log.v(TAG, "@@@ touch panen");
-//				return false;
-//			}
-//		});
-        
+
+		// layout.setOnTouchListener(new OnTouchListener() {
+		//
+		// @Override
+		// public boolean onTouch(View v, MotionEvent event) {
+		// Log.v(TAG, "@@@ touch panen");
+		// return false;
+		// }
+		// });
+
 		new DownloadMapAsyncTask(this, mRenderer).execute();
 		initLoader();
 	}
@@ -154,6 +162,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 			if (mRenderer.getSelectedObject() == null) {
 				return true;
 			} else if (isMoveFirst == false) {
+				mRenderer.pauseCamAnim();
 				objx = mRenderer.getSelectedObject().getX();
 				objy = mRenderer.getSelectedObject().getY();
 				objz = mRenderer.getSelectedObject().getZ();
@@ -172,6 +181,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 			}
 			break;
 		case MotionEvent.ACTION_UP:
+			mRenderer.playCamAnim();
 			if (isInDropArea && mRenderer.getSelectedObject() != null) {
 				Bitmap bm = ((MyPlane) mRenderer.getSelectedObject())
 						.getBitmap();
@@ -228,7 +238,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 		// Vibrate for 50 milliseconds
 		v.vibrate(50);
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -240,17 +250,24 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 			}
 		}
 	}
-	
+
 	long backcount = 0;
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (backcount == 0 || (System.currentTimeMillis() - backcount > 2000)) {
-				Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
+			if (backcount == 0
+					|| (System.currentTimeMillis() - backcount > 2000)) {
+				Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT)
+						.show();
 				backcount = System.currentTimeMillis();
 				return true;
 			}
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	public void coordinate(View v) {
+		Toast.makeText(this, "coordinate saved", Toast.LENGTH_LONG).show();
 	}
 }

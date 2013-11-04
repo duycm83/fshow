@@ -214,4 +214,13 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 	public void refresh() {
 		isRefresh = true;
 	}
+	
+	public void pauseCamAnim() {
+		mCamAnim.pause();
+	}
+	
+	public void playCamAnim() {
+		mCamAnim.play();
+	}
+	
 }

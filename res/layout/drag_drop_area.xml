@@ -2,6 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
     tools:context=".ObjectDraggingActivity" >
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -16,31 +18,40 @@
             android:gravity="center"
             android:textSize="16sp" />
 
-        <HorizontalScrollView
-            android:id="@+id/horizontalScrollView1"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:background="@android:drawable/spinner_background" >
+            android:layout_height="match_parent" >
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/brought_by"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical" >
+                android:layout_height="10dp"
+                android:gravity="center|top" />
 
-                <TextView
-                    android:id="@+id/brought_by"
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:gravity="center|top"/>
+            <HorizontalScrollView
+                android:id="@+id/horizontalScrollView1"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:background="@android:drawable/spinner_background" >
 
                 <LinearLayout
                     android:id="@+id/dropArea"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal" >
                 </LinearLayout>
-            </LinearLayout>
-        </HorizontalScrollView>
+            </HorizontalScrollView>
+
+            <Button
+                android:id="@+id/coordinate"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_horizontal"
+                android:text="@string/coordinate"
+                android:onClick="coordinate"
+                android:visibility="gone" />
+        </RelativeLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </LinearLayout>

@@ -22,4 +22,5 @@
     <string name="login">ログイン</string>
     <string name="myitem">登録したアイテムのみ</string>
     <string name="allitem">全てアイテム</string>
+    <string name="coordinate">コーディネート</string>
 </resources>
