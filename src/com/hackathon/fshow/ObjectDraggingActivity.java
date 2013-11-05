@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -21,13 +20,10 @@ import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hackathon.fshow.module.DownloadMapAsyncTask;
 import com.hackathon.fshow.module.MyPlane;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
 public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 		OnTouchListener {
@@ -68,68 +64,68 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 		LinearLayout dragArea = (LinearLayout) LayoutInflater.from(this)
 				.inflate(R.layout.drag_drop_area, null);
 		dragArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT));
+				LayoutParams.WRAP_CONTENT));
 		dragArea.setGravity(Gravity.CENTER_HORIZONTAL);
 		ll.addView(dragArea);
 		dropArea = (LinearLayout) dragArea.findViewById(R.id.dropArea);
 		mLayout.addView(ll);
 
-		SlidingUpPanelLayout layout = (SlidingUpPanelLayout) mLayout
-				.findViewById(R.id.sliding_layout);
-		layout.setShadowDrawable(getResources().getDrawable(
-				R.drawable.above_shadow));
-		layout.setAnchorPoint(0.3f);
-		layout.setPanelSlideListener(new PanelSlideListener() {
-			@Override
-			public void onPanelSlide(View panel, float slideOffset) {
-				Log.v(TAG, "@@@onPanelSlide ");
-				// if (slideOffset < 0.2) {
-				// if (getActionBar().isShowing()) {
-				// getActionBar().hide();
-				// }
-				// }
-				// else {
-				// if (!getActionBar().isShowing()) {
-				// getActionBar().show();
-				// }
-				// }
-
-//				if (slideOffset < 0.2) {
-//					panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
-//				} else {
-//					panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
-//				}
-			}
-
-			@Override
-			public void onPanelExpanded(View panel) {
-				Log.v(TAG, "@@@onPanelExpanded ");
-				panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onPanelCollapsed(View panel) {
-				Log.v(TAG, "@@@onPanelCollapsed");
-				panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
-			}
-
-			@Override
-			public void onPanelAnchored(View panel) {
-				Log.v(TAG, "@@@onPanelAnchored");
-			}
-		}); 
-		TextView t = (TextView) mLayout.findViewById(R.id.brought_by);
-		t.setMovementMethod(LinkMovementMethod.getInstance());
-
-		TextView content = (TextView) layout.findViewById(R.id.content);
-		content.setOnTouchListener(new OnTouchListener() {
-
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				Log.v(TAG, "@@@ touch content");
-				return ObjectDraggingActivity.this.onTouch(v, event);
-			}
-		});
+//		SlidingUpPanelLayout layout = (SlidingUpPanelLayout) mLayout
+//				.findViewById(R.id.sliding_layout);
+//		layout.setShadowDrawable(getResources().getDrawable(
+//				R.drawable.above_shadow));
+//		layout.setAnchorPoint(0.3f);
+//		layout.setPanelSlideListener(new PanelSlideListener() {
+//			@Override
+//			public void onPanelSlide(View panel, float slideOffset) {
+//				Log.v(TAG, "@@@onPanelSlide ");
+//				// if (slideOffset < 0.2) {
+//				// if (getActionBar().isShowing()) {
+//				// getActionBar().hide();
+//				// }
+//				// }
+//				// else {
+//				// if (!getActionBar().isShowing()) {
+//				// getActionBar().show();
+//				// }
+//				// }
+//
+////				if (slideOffset < 0.2) {
+////					panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
+////				} else {
+////					panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
+////				}
+//			}
+//
+//			@Override
+//			public void onPanelExpanded(View panel) {
+//				Log.v(TAG, "@@@onPanelExpanded ");
+//				panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
+//			}
+//
+//			@Override
+//			public void onPanelCollapsed(View panel) {
+//				Log.v(TAG, "@@@onPanelCollapsed");
+//				panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
+//			}
+//
+//			@Override
+//			public void onPanelAnchored(View panel) {
+//				Log.v(TAG, "@@@onPanelAnchored");
+//			}
+//		}); 
+//		TextView t = (TextView) mLayout.findViewById(R.id.brought_by);
+//		t.setMovementMethod(LinkMovementMethod.getInstance());
+//
+//		TextView content = (TextView) layout.findViewById(R.id.content);
+//		content.setOnTouchListener(new OnTouchListener() {
+//
+//			@Override
+//			public boolean onTouch(View v, MotionEvent event) {
+//				Log.v(TAG, "@@@ touch content");
+//				return ObjectDraggingActivity.this.onTouch(v, event);
+//			}
+//		});
 
 		// layout.setOnTouchListener(new OnTouchListener() {
 		//
