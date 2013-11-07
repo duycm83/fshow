@@ -1,5 +1,6 @@
 package com.hackathon.fshow;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.DragShadowBuilder;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -70,72 +72,6 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 		dropArea = (LinearLayout) dragArea.findViewById(R.id.dropArea);
 		mLayout.addView(ll);
 
-//		SlidingUpPanelLayout layout = (SlidingUpPanelLayout) mLayout
-//				.findViewById(R.id.sliding_layout);
-//		layout.setShadowDrawable(getResources().getDrawable(
-//				R.drawable.above_shadow));
-//		layout.setAnchorPoint(0.3f);
-//		layout.setPanelSlideListener(new PanelSlideListener() {
-//			@Override
-//			public void onPanelSlide(View panel, float slideOffset) {
-//				Log.v(TAG, "@@@onPanelSlide ");
-//				// if (slideOffset < 0.2) {
-//				// if (getActionBar().isShowing()) {
-//				// getActionBar().hide();
-//				// }
-//				// }
-//				// else {
-//				// if (!getActionBar().isShowing()) {
-//				// getActionBar().show();
-//				// }
-//				// }
-//
-////				if (slideOffset < 0.2) {
-////					panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
-////				} else {
-////					panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
-////				}
-//			}
-//
-//			@Override
-//			public void onPanelExpanded(View panel) {
-//				Log.v(TAG, "@@@onPanelExpanded ");
-//				panel.findViewById(R.id.coordinate).setVisibility(View.VISIBLE);
-//			}
-//
-//			@Override
-//			public void onPanelCollapsed(View panel) {
-//				Log.v(TAG, "@@@onPanelCollapsed");
-//				panel.findViewById(R.id.coordinate).setVisibility(View.GONE);
-//			}
-//
-//			@Override
-//			public void onPanelAnchored(View panel) {
-//				Log.v(TAG, "@@@onPanelAnchored");
-//			}
-//		}); 
-//		TextView t = (TextView) mLayout.findViewById(R.id.brought_by);
-//		t.setMovementMethod(LinkMovementMethod.getInstance());
-//
-//		TextView content = (TextView) layout.findViewById(R.id.content);
-//		content.setOnTouchListener(new OnTouchListener() {
-//
-//			@Override
-//			public boolean onTouch(View v, MotionEvent event) {
-//				Log.v(TAG, "@@@ touch content");
-//				return ObjectDraggingActivity.this.onTouch(v, event);
-//			}
-//		});
-
-		// layout.setOnTouchListener(new OnTouchListener() {
-		//
-		// @Override
-		// public boolean onTouch(View v, MotionEvent event) {
-		// Log.v(TAG, "@@@ touch panen");
-		// return false;
-		// }
-		// });
-
 		new DownloadMapAsyncTask(this, mRenderer).execute();
 		initLoader();
 	}
@@ -182,6 +118,8 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 				Bitmap bm = ((MyPlane) mRenderer.getSelectedObject())
 						.getBitmap();
 				ImageView imageView = new ImageView(this);
+				imageView.setClickable(true);
+				imageView.setOnTouchListener(mOnTouchListener);
 				imageView.setImageBitmap(bm);
 				dropArea.addView(imageView);
 				mRenderer.getSelectedObject().setX(objx);
@@ -266,4 +204,17 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 	public void coordinate(View v) {
 		Toast.makeText(this, "coordinate saved", Toast.LENGTH_LONG).show();
 	}
+	
+	private OnTouchListener mOnTouchListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == MotionEvent.ACTION_MOVE) {
+				ClipData data = ClipData.newPlainText("msg",
+						"Please drop to robot.");
+				v.startDrag(data, new DragShadowBuilder(v), null, 0);
+				return true;
+			}
+			return false;
+		}
+	};
 }
