@@ -1,6 +1,8 @@
 package com.hackathon.fshow;
 
+import rajawali.BaseObject3D;
 import android.content.ClipData;
+import android.content.ClipData.Item;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +11,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.Display;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.DragShadowBuilder;
+import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +38,7 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 	private int mScreenWidth = 0;
 	private int mScreenHeight = 0;
 	private LinearLayout dropArea = null;
+	private LinearLayout dragArea = null;
 	private float objx, objy, objz;
 	private boolean isMoveFirst = false;
 	private boolean isInDropArea = false;
@@ -74,6 +79,9 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 
 		new DownloadMapAsyncTask(this, mRenderer).execute();
 		initLoader();
+
+		dragArea = (LinearLayout) dragArea.findViewById(R.id.dragArea);
+		setDragEvent(dragArea);
 	}
 
 	@Override
@@ -85,19 +93,22 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 	public boolean onTouch(View v, MotionEvent event) {
 		float x = event.getX();
 		float y = event.getY();
+		BaseObject3D selectedObject = mRenderer.getSelectedObject();
+		MyPlane myPlane = null;
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mRenderer.getObjectAt(x, y);
 			break;
 		case MotionEvent.ACTION_MOVE:
 			mRenderer.moveSelectedObject(x, y);
-			if (mRenderer.getSelectedObject() == null) {
+			if (selectedObject == null) {
 				return true;
 			} else if (isMoveFirst == false) {
+				myPlane = (MyPlane) selectedObject;
 				mRenderer.pauseCamAnim();
-				objx = mRenderer.getSelectedObject().getX();
-				objy = mRenderer.getSelectedObject().getY();
-				objz = mRenderer.getSelectedObject().getZ();
+				objx = selectedObject.getX();
+				objy = selectedObject.getY();
+				objz = selectedObject.getZ();
 				isMoveFirst = true;
 			}
 			if (y > (mScreenHeight - 200)) {
@@ -105,8 +116,8 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 					vibrate();
 					isInDropArea = true;
 				}
-				String name = ((MyPlane) mRenderer.getSelectedObject())
-						.getName();
+				myPlane = (MyPlane) selectedObject;
+				String name = myPlane.getName();
 				Log.v(TAG, "@@@selected " + name);
 			} else {
 				isInDropArea = false;
@@ -114,17 +125,18 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 			break;
 		case MotionEvent.ACTION_UP:
 			mRenderer.playCamAnim();
-			if (isInDropArea && mRenderer.getSelectedObject() != null) {
-				Bitmap bm = ((MyPlane) mRenderer.getSelectedObject())
-						.getBitmap();
+			if (isInDropArea && selectedObject != null) {
+				myPlane = (MyPlane) selectedObject;
+				Bitmap bm = myPlane.getBitmap();
 				ImageView imageView = new ImageView(this);
 				imageView.setClickable(true);
 				imageView.setOnTouchListener(mOnTouchListener);
 				imageView.setImageBitmap(bm);
+				imageView.setTag(myPlane.getName());
 				dropArea.addView(imageView);
-				mRenderer.getSelectedObject().setX(objx);
-				mRenderer.getSelectedObject().setY(objy);
-				mRenderer.getSelectedObject().setZ(objz);
+				selectedObject.setX(objx);
+				selectedObject.setY(objy);
+				selectedObject.setZ(objz);
 				isMoveFirst = false;
 			}
 			mRenderer.stopMovingSelectedObject();
@@ -200,21 +212,94 @@ public class ObjectDraggingActivity extends RajawaliExampleActivity implements
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	public void coordinate(View v) {
 		Toast.makeText(this, "coordinate saved", Toast.LENGTH_LONG).show();
 	}
-	
+
 	private OnTouchListener mOnTouchListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getAction() == MotionEvent.ACTION_MOVE) {
 				ClipData data = ClipData.newPlainText("msg",
-						"Please drop to robot.");
+						(CharSequence) v.getTag());
 				v.startDrag(data, new DragShadowBuilder(v), null, 0);
 				return true;
 			}
 			return false;
 		}
 	};
+
+	private void setDragEvent(LinearLayout groupOfView) {
+		OnDragListener onDragListener = new OnDragListener() {
+			@Override
+			public boolean onDrag(View v, DragEvent event) {
+				// Log.v(TAG, "@@@ onDrag:"+event.getAction());
+				if (event.getAction() == DragEvent.ACTION_DROP) {
+					Log.v(TAG, "@@@ drop");
+					ClipData data = event.getClipData();
+					Item item = data.getItemAt(0);
+					if (item != null) {
+						String objName = (String) item.getText();
+						BaseObject3D obj = mRenderer.getChildByName(objName);
+						if (obj != null && obj instanceof MyPlane) {
+							ImageView imageView = (ImageView) v;
+							Bitmap bmp = ((MyPlane) obj).getBitmap();
+							imageView.setImageBitmap(bmp);
+						}
+					}
+				} else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED) {
+					if (!event.getResult()) {
+					}
+					Log.v(TAG, "@@@ drag end");
+				}
+				return true;
+			}
+		};
+
+		OnTouchListener onTouchListener = new OnTouchListener() {
+			long firstTouch = 0;
+			View touchView1 = null;
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					if (touchView1 == null) {
+						touchView1 = v;
+					}
+					long sub = System.currentTimeMillis() - firstTouch;
+					if (sub <= 1000) {
+						if (touchView1 == v) {
+							((ImageView) v)
+									.setImageResource(R.drawable.t_shirt);
+							touchView1 = null;
+						} else {
+							touchView1 = v;
+						}
+
+					} else {
+						touchView1 = null;
+					}
+					firstTouch = System.currentTimeMillis();
+				}
+				return true;
+			}
+		};
+
+		int count = groupOfView.getChildCount();
+		for (int i = 0; i < count; i++) {
+			View child = groupOfView.getChildAt(i);
+			if (child instanceof LinearLayout) {
+				int count2 = ((LinearLayout) child).getChildCount();
+				for (int j = 0; j < count2; j++) {
+					View child2 = ((LinearLayout) child).getChildAt(j);
+					if (child2 instanceof ImageView) {
+						child2.setOnDragListener(onDragListener);
+						child2.setOnTouchListener(onTouchListener);
+					}
+				}
+
+			}
+		}
+	}
 }

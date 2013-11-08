@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.hackathon.fshow.module.AutoGenerateItem;
+import com.hackathon.fshow.module.MyPlane;
 
 public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		OnObjectPickedListener {
@@ -206,6 +207,17 @@ public class ObjectDraggingRenderer extends RajawaliRenderer implements
 		mListChild.clear();
 	}
 	
+	public BaseObject3D getChildByName(String name) {
+		BaseObject3D result = null;
+		for (BaseObject3D obj : mListChild) {
+			MyPlane myPlane = ((MyPlane) obj);
+			if (myPlane.getName().equals(name)) {
+				result = obj;
+				break;
+			}
+		}
+		return result;
+	}
 	public void showItems(JSONArray data) {
 		removeAllChild();
 		AutoGenerateItem.showItems(mContext, this, mPicker, light, data);
