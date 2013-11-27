@@ -30,5 +30,16 @@ public class MyPlane extends Plane {
 		this.bitmap = bitmap;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		} else if (o instanceof MyPlane) {
+			MyPlane that = ((MyPlane) o);
+			return that.getName().equals(this.name);
+		} else {
+			return false;
+		}
+	}
 	
 }
