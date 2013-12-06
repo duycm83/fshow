@@ -29,9 +29,8 @@ public class ImageUtils {
 			imageByte = Base64.decode(imageString, Base64.DEFAULT);
 			ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
 			Options imageOptions = new BitmapFactory.Options();
-	        imageOptions.inSampleSize = 1;
-	        imageOptions.inPurgeable = true;
-	        imageOptions.inInputShareable = true;
+			imageOptions.inPurgeable = true;
+			imageOptions.inInputShareable = true;
 			image = BitmapFactory.decodeStream(bis, null, imageOptions);
 			bis.close();
 		} catch (Exception e) {

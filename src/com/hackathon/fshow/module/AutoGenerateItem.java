@@ -5,7 +5,7 @@ import org.json.JSONException;
 
 import rajawali.lights.DirectionalLight;
 import rajawali.materials.Material;
-import rajawali.materials.methods.DiffuseMethod;
+import rajawali.materials.textures.ATexture;
 import rajawali.materials.textures.ATexture.TextureException;
 import rajawali.materials.textures.Texture;
 import rajawali.util.ObjectColorPicker;
@@ -23,39 +23,47 @@ public class AutoGenerateItem {
 	public static void addNewItem(Context ctx, ObjectDraggingRenderer renderer,
 			ObjectColorPicker picker, DirectionalLight light, int itemId,
 			String imageBase64) {
+		Material material = new Material();
+		String name = String.format("image%04d", itemId);
+		Bitmap bmp = ImageUtils.decodeToImage(imageBase64);
+		if (bmp == null) {
+			Log.e(TAG, "@@@error name:" + name);
+			return;
+		}
+		MyPlane plane = new MyPlane(name, bmp);
+		plane.setDoubleSided(true);
+		plane.setRotY(180);
+		plane.setMaterial(material);
+		//			plane.setX(-4 + (float) (Math.random() * 8));
+		//			plane.setY(-4 + (float) (Math.random() * 8));
+		//			plane.setZ(-2 + (float) (Math.random() * -6));
+		//			Sphere sphere = new Sphere(.3f, 12, 12);
+		plane.setColor(0x333333 + (int) (Math.random() * 0xcccccc));
+		plane.setX(-4 + (Math.random() * 8));
+		plane.setY(-4 + (Math.random() * 8));
+		plane.setZ(-2 + (Math.random() * -6));
+		//			plane.setDrawingMode(GLES20.GL_LINE_LOOP);
+		picker.registerObject(plane);
+		renderer.addChild(plane);
+		
 		try {
-			Material material = new Material();
-			material.enableLighting(true);
-			material.setDiffuseMethod(new DiffuseMethod.Lambert());
-			String name = String.format("image%04d", itemId);
-			Bitmap bmp = ImageUtils.decodeToImage(imageBase64);
-			if (bmp == null) {
-				Log.e(TAG, "@@@error name:" + name);
-				return;
-			}
-			Texture texture = new Texture(name, bmp);
+			ATexture texture = new Texture(name, bmp);
 			texture.setMipmap(false);
 			texture.shouldRecycle(true);
-			material.addTexture(texture);
+			material.addTexture(renderer.getTextureManager().addTexture(texture));
 			material.setColorInfluence(0);
-			MyPlane plane = new MyPlane(name, bmp);
-			plane.setDoubleSided(true);
-			plane.setRotY(180);
-			plane.setMaterial(material);
-			plane.setX(-4 + (float) (Math.random() * 8));
-			plane.setY(-4 + (float) (Math.random() * 8));
-			plane.setZ(-2 + (float) (Math.random() * -6));
-			picker.registerObject(plane);
-			renderer.addChild(plane);
 		} catch (TextureException e) {
 			e.printStackTrace();
 		}
+	
+
 	}
 
 	public static void showItems(Context context,
 			ObjectDraggingRenderer renderer, ObjectColorPicker picker,
 			DirectionalLight light, JSONArray mData) {
-		if (mData == null) return;
+		if (mData == null)
+			return;
 		try {
 			int size = mData.length();
 			for (int i = 0; i < size; i++) {
